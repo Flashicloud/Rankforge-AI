@@ -1,0 +1,51 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users/{userId}/articles
+    // Document ID: auto-generated
+    // Fields:
+    //   - userId: string (required) - The ID of the user who generated the article
+    //   - keyword: string (required) - The target keyword for the article
+    //   - content: string (required) - The final generated or optimized content (Markdown)
+    //   - seoScore: number (optional) - The SEO score of the article
+    //   - mode: string (required) - The mode used to create the article (generate or optimize)
+    //   - createdAt: string (required) - The timestamp when the article was created
+    //
+    // ===============================================================
+
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    function isValidArticle(userId) {
+      return hasRequiredFields(['userId', 'keyword', 'content', 'mode', 'createdAt']) &&
+             request.resource.data.userId == userId &&
+             request.resource.data.keyword is string && request.resource.data.keyword.size() > 0 && request.resource.data.keyword.size() < 500 &&
+             request.resource.data.content is string && request.resource.data.content.size() > 0 && request.resource.data.content.size() < 100000 &&
+             request.resource.data.mode in ['generate', 'optimize'] &&
+             request.resource.data.createdAt is string &&
+             (!('seoScore' in request.resource.data) || (request.resource.data.seoScore is number && request.resource.data.seoScore >= 0 && request.resource.data.seoScore <= 100));
+    }
+
+    match /users/{userId}/articles/{articleId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidArticle(userId);
+      allow update: if isOwner(userId) && isValidArticle(userId) && request.resource.data.userId == resource.data.userId && request.resource.data.createdAt == resource.data.createdAt;
+      allow delete: if isOwner(userId);
+    }
+  }
+}
