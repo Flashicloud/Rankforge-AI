@@ -8,7 +8,6 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { generateSEOContent, optimizeSEOContent } from './services/gemini';
 import { Search, Sparkles, FileText, AlertCircle, Copy, Check, Loader2, Layers, BarChart3, Target, Network, ShieldCheck, PenTool, ScanSearch, Zap, ChevronDown, ChevronUp, TrendingUp, BrainCircuit, Fingerprint, ArrowRight, Terminal, FileEdit, Brain, Globe, LogIn, LogOut, LayoutDashboard, Save, X } from 'lucide-react';
-import { SEO_ARCHITECT_PROMPT } from './constants';
 import { motion, AnimatePresence } from 'motion/react';
 import ReactQuill from 'react-quill-new';
 import 'react-quill/dist/quill.snow.css';
@@ -567,7 +566,6 @@ export default function App() {
   const [content, setContent] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
-  const [showPrompt, setShowPrompt] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string>('');
   const [includePhase0, setIncludePhase0] = useState(true);
   const [contentType, setContentType] = useState('');
@@ -806,13 +804,6 @@ export default function App() {
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <button 
-              onClick={() => setShowPrompt(!showPrompt)}
-              className="text-xs font-medium text-zinc-400 hover:text-white transition-colors px-4 py-2 rounded-full border border-white/10 hover:border-white/20 hover:bg-white/5 flex items-center gap-2"
-            >
-              <FileText className="w-3 h-3" />
-              {showPrompt ? 'Hide System Prompt' : 'View System Prompt'}
-            </button>
             {isAuthReady && (
               user ? (
                 <div className="flex items-center gap-2">
@@ -863,30 +854,6 @@ export default function App() {
           }} />
         ) : (
           <>
-            {/* System Prompt Accordion */}
-        <AnimatePresence>
-          {showPrompt && (
-            <motion.div 
-              initial={{ opacity: 0, height: 0, marginBottom: 0 }}
-              animate={{ opacity: 1, height: 'auto', marginBottom: 32 }}
-              exit={{ opacity: 0, height: 0, marginBottom: 0 }}
-              className="bg-zinc-900/50 rounded-2xl overflow-hidden border border-white/10 backdrop-blur-md"
-            >
-              <div className="px-6 py-4 border-b border-white/5 bg-black/20 flex justify-between items-center">
-                <h3 className="text-xs font-mono text-zinc-400 uppercase tracking-wider flex items-center gap-2">
-                  <FileText className="w-4 h-4" />
-                  System Instruction (Read-Only)
-                </h3>
-              </div>
-              <div className="p-6 max-h-[400px] overflow-y-auto custom-scrollbar">
-                <pre className="text-xs font-mono text-emerald-400/90 whitespace-pre-wrap leading-relaxed">
-                  {SEO_ARCHITECT_PROMPT}
-                </pre>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
         {/* Mode Switcher */}
         {!content && !isGenerating && (
           <div className="flex justify-center mb-8">
