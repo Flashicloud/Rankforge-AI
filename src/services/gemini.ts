@@ -62,12 +62,52 @@ async function runPhase(
     `;
   }
 
+  let scrapedDataText = "";
+  if (phaseId === 1) {
+    if (onProgress) onProgress(`Executing Phase ${phaseId}: Fetching Live SERP Data via Google API...`);
+    try {
+      const res = await fetch('/api/scrape-serp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ keyword })
+      });
+      const data = await res.json();
+      
+      if (!res.ok) {
+        console.error("Scraper API Error:", data.error);
+        if (onProgress) onProgress(`Scraping Error: ${data.error}`);
+        scrapedDataText = `\n\n(Note: Live SERP scraping failed due to API error. Rely on your internal knowledge and the googleSearch tool.)\n`;
+      } else if (data.success && data.data && data.data.length > 0) {
+        scrapedDataText = `\n\n*** LIVE SERP SCRAPED DATA (GOOGLE SEARCH) ***\nHere is the actual content from the top ranking pages for "${keyword}":\n`;
+        let successCount = 0;
+        let failCount = 0;
+        
+        data.data.forEach((item: any, index: number) => {
+          if (item.status === 'Success') {
+            successCount++;
+          } else {
+            failCount++;
+          }
+          scrapedDataText += `\n--- Competitor ${index + 1} (${item.url}) [Status: ${item.status}] ---\n${item.content}\n`;
+        });
+        scrapedDataText += `\nUse this exact scraped data to perform your N-Gram analysis, entity extraction, and competitor benchmarking instead of hallucinating.\n`;
+        
+        if (onProgress) onProgress(`Scraping Complete: ${successCount} URLs read successfully, ${failCount} blocked/failed.`);
+      }
+    } catch (e) {
+      console.error("Failed to scrape SERP data:", e);
+      scrapedDataText = `\n\n(Note: Live SERP scraping failed. Rely on your internal knowledge and the googleSearch tool.)\n`;
+    }
+    if (onProgress) onProgress(`Executing Phase ${phaseId}: ${phaseName} (${model})...`);
+  }
+
   const prompt = `
     ${SEO_ARCHITECT_PROMPT}
 
     *** CONTEXT SO FAR ***
     Target Keyword: "${keyword}"
     ${contextInjection}
+    ${scrapedDataText}
     
     PREVIOUS OUTPUTS:
     ${context}
