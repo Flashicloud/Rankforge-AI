@@ -115,7 +115,7 @@ function LandingPage({ onStart, onShowAuth, user }: { onStart: () => void, onSho
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-indigo-500/20 rounded-full blur-[120px] opacity-50 pointer-events-none"></div>
         <div className="max-w-7xl mx-auto px-6 relative z-10 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-sm font-medium mb-8">
-            <Sparkles className="w-4 h-4" />
+            <Brain className="w-4 h-4" />
             The Next Generation of SEO Content
           </div>
           <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-8 leading-tight">
@@ -153,8 +153,8 @@ function LandingPage({ onStart, onShowAuth, user }: { onStart: () => void, onSho
               <div className="w-14 h-14 bg-purple-500/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                 <TrendingUp className="w-7 h-7 text-purple-400" />
               </div>
-              <h3 className="text-xl font-bold mb-3">SEO Optimization</h3>
-              <p className="text-zinc-400 leading-relaxed">Optimize existing content or generate from scratch. We inject missing semantic entities and LSI keywords to boost your topical authority.</p>
+              <h3 className="text-xl font-bold mb-3">Surfer-Level NLP Pipeline</h3>
+              <p className="text-zinc-400 leading-relaxed">Our premium engine acts like Surfer SEO on autopilot. It injects missing semantic entities, LSI keywords, and optimizes NLP scores to boost your topical authority.</p>
             </div>
 
             <div className="bg-[#0a0a0a] p-8 rounded-3xl border border-white/5 hover:border-pink-500/30 transition-colors group">
@@ -188,7 +188,7 @@ function LandingPage({ onStart, onShowAuth, user }: { onStart: () => void, onSho
           </div>
           
           <div className="mb-16">
-            <h4 className="text-lg font-bold text-indigo-400 mb-6 flex items-center gap-2 justify-center"><Sparkles className="w-5 h-5" /> For Generating New Content</h4>
+            <h4 className="text-lg font-bold text-indigo-400 mb-6 flex items-center gap-2 justify-center"><Brain className="w-5 h-5" /> For Generating New Content</h4>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="bg-zinc-900/30 border border-white/5 p-8 rounded-2xl hover:bg-zinc-900/50 transition-colors">
                 <div className="w-12 h-12 bg-indigo-500/10 rounded-xl flex items-center justify-center mb-6 border border-indigo-500/20">
@@ -270,7 +270,7 @@ function LandingPage({ onStart, onShowAuth, user }: { onStart: () => void, onSho
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 max-w-6xl mx-auto">
           {/* Generation Timeline */}
           <div className="bg-zinc-900/20 p-8 rounded-3xl border border-white/5">
-            <h4 className="text-xl font-bold text-indigo-400 mb-10 flex items-center gap-3"><Sparkles className="w-6 h-6" /> Content Generation Engine</h4>
+            <h4 className="text-xl font-bold text-indigo-400 mb-10 flex items-center gap-3"><Brain className="w-6 h-6" /> Content Generation Engine</h4>
             <div className="relative">
               <div className="absolute left-[27px] top-0 bottom-0 w-px bg-gradient-to-b from-indigo-500/50 via-purple-500/50 to-transparent"></div>
               <div className="space-y-12">
@@ -450,6 +450,10 @@ function LandingPage({ onStart, onShowAuth, user }: { onStart: () => void, onSho
                 <li className="flex items-start gap-3 text-zinc-300 text-sm">
                   <Check className="w-5 h-5 text-emerald-400 flex-shrink-0" />
                   <span><strong>50</strong> Articles per month</span>
+                </li>
+                <li className="flex items-start gap-3 text-zinc-300 text-sm">
+                  <Check className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+                  <span><strong>Surfer-Level NLP Pipeline</strong></span>
                 </li>
                 <li className="flex items-start gap-3 text-zinc-300 text-sm">
                   <Check className="w-5 h-5 text-emerald-400 flex-shrink-0" />
@@ -811,7 +815,7 @@ export default function App() {
                     onClick={() => setView(view === 'dashboard' ? 'app' : 'dashboard')}
                     className="text-xs font-medium text-white transition-colors px-4 py-2 rounded-full bg-indigo-500 hover:bg-indigo-600 flex items-center gap-2"
                   >
-                    {view === 'dashboard' ? <Sparkles className="w-3 h-3" /> : <LayoutDashboard className="w-3 h-3" />}
+                    {view === 'dashboard' ? <Brain className="w-3 h-3" /> : <LayoutDashboard className="w-3 h-3" />}
                     {view === 'dashboard' ? 'Back to App' : 'Dashboard'}
                   </button>
                   <button
@@ -862,7 +866,7 @@ export default function App() {
                 onClick={() => { setMode('generate'); setContent(null); setError(null); }}
                 className={`flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-bold transition-all ${mode === 'generate' ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/25' : 'text-zinc-400 hover:text-white hover:bg-white/5'}`}
               >
-                <Sparkles className="w-4 h-4" /> Generate New Article
+                <Brain className="w-4 h-4" /> Generate New Article
               </button>
               <button
                 onClick={() => { setMode('optimize'); setContent(null); setError(null); }}
@@ -882,7 +886,11 @@ export default function App() {
             transition={{ duration: 0.5 }}
             className="w-full max-w-3xl"
           >
-            <h2 className={`text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r mb-6 tracking-tight ${mode === 'generate' ? 'from-white via-indigo-200 to-indigo-400' : 'from-white via-emerald-200 to-emerald-400'}`}>
+            <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full border mb-6 text-sm font-medium shadow-lg ${mode === 'generate' ? 'bg-indigo-500/10 border-indigo-500/20 text-indigo-300 shadow-indigo-500/10' : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-300 shadow-emerald-500/10'}`}>
+              <Sparkles className="w-4 h-4" />
+              <span>Premium Feature: Surfer-Level NLP Pipeline</span>
+            </div>
+            <h2 className={`text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r mb-6 pb-2 tracking-tight ${mode === 'generate' ? 'from-white via-indigo-200 to-indigo-400' : 'from-white via-emerald-200 to-emerald-400'}`}>
               {mode === 'generate' ? 'Dominate the SERPs with AI Precision' : 'Revive & Optimize Existing Content'}
             </h2>
             <p className="text-lg text-zinc-400 mb-10 leading-relaxed max-w-2xl mx-auto">
