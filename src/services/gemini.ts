@@ -1,7 +1,19 @@
 import { GoogleGenAI } from "@google/genai";
 import { SEO_ARCHITECT_PROMPT, ARTICLE_OPTIMIZATION_PROMPT } from "../constants";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+let aiInstance: GoogleGenAI | null = null;
+
+function getAI() {
+  if (!aiInstance) {
+    // Try process.env first (for AI Studio environment), then fallback to import.meta.env (for Vite/Hostinger)
+    const apiKey = process.env.GEMINI_API_KEY || (import.meta as any).env?.VITE_GEMINI_API_KEY;
+    if (!apiKey) {
+      throw new Error("Gemini API Key is missing. Please add VITE_GEMINI_API_KEY to your environment variables on Hostinger.");
+    }
+    aiInstance = new GoogleGenAI({ apiKey });
+  }
+  return aiInstance;
+}
 
 // Helper to run a specific phase
 async function runPhase(
@@ -124,7 +136,7 @@ async function runPhase(
   // We no longer use internal googleSearch to avoid confusion with our custom scraper
   const tools = undefined;
 
-  const response = await ai.models.generateContent({
+  const response = await getAI().models.generateContent({
     model: model,
     contents: prompt,
     config: {
@@ -238,7 +250,7 @@ export async function optimizeSEOContent(
     let currentPhase = 1;
 
     try {
-      const responseStream = await ai.models.generateContentStream({
+      const responseStream = await getAI().models.generateContentStream({
         model: "gemini-3.1-pro-preview",
         contents: prompt,
         config: {
@@ -284,7 +296,7 @@ export async function optimizeSEOContent(
       console.warn("Streaming failed, falling back to standard generation...", streamError);
       if (onProgress) onProgress("Network stream interrupted. Resuming optimization in background (this may take a minute)...");
       
-      const response = await ai.models.generateContent({
+      const response = await getAI().models.generateContent({
         model: "gemini-3.1-pro-preview",
         contents: prompt,
         config: {
