@@ -32,7 +32,7 @@ async function startServer() {
       // 1. Fetch URLs from Serper.dev API
       const searchRes = await axios.post('https://google.serper.dev/search', {
         q: keyword,
-        num: 3
+        num: 5
       }, {
         headers: {
           'X-API-KEY': apiKey,
@@ -44,7 +44,7 @@ async function startServer() {
          return res.json({ success: true, data: [], message: 'No results found on Google via Serper.' });
       }
 
-      const urls = searchRes.data.organic.slice(0, 3).map((item: any) => item.link);
+      const urls = searchRes.data.organic.slice(0, 5).map((item: any) => item.link);
       console.log(`[Scraper] Found ${urls.length} URLs from Serper.`);
 
       // 2. Scrape the content of each URL

@@ -76,7 +76,7 @@ async function runPhase(
       if (!res.ok) {
         console.error("Scraper API Error:", data.error);
         if (onProgress) onProgress(`Scraping Error: ${data.error}`);
-        scrapedDataText = `\n\n(Note: Live SERP scraping failed due to API error. Rely on your internal knowledge and the googleSearch tool.)\n`;
+        scrapedDataText = `\n\n(Note: Live SERP scraping failed due to API error. Rely on your internal knowledge.)\n`;
       } else if (data.success && data.data && data.data.length > 0) {
         scrapedDataText = `\n\n*** LIVE SERP SCRAPED DATA (GOOGLE SEARCH) ***\nHere is the actual content from the top ranking pages for "${keyword}":\n`;
         let successCount = 0;
@@ -96,7 +96,7 @@ async function runPhase(
       }
     } catch (e) {
       console.error("Failed to scrape SERP data:", e);
-      scrapedDataText = `\n\n(Note: Live SERP scraping failed. Rely on your internal knowledge and the googleSearch tool.)\n`;
+      scrapedDataText = `\n\n(Note: Live SERP scraping failed. Rely on your internal knowledge.)\n`;
     }
     if (onProgress) onProgress(`Executing Phase ${phaseId}: ${phaseName} (${model})...`);
   }
@@ -121,8 +121,8 @@ async function runPhase(
   `;
 
   // Determine tools config based on phase
-  // Phase 1 needs Google Search for SERP analysis
-  const tools = phaseId === 1 ? [{ googleSearch: {} }] : undefined;
+  // We no longer use internal googleSearch to avoid confusion with our custom scraper
+  const tools = undefined;
 
   const response = await ai.models.generateContent({
     model: model,
@@ -243,6 +243,7 @@ export async function optimizeSEOContent(
         contents: prompt,
         config: {
           temperature: 0.7,
+          tools: [{ googleSearch: {} }]
         }
       });
 
