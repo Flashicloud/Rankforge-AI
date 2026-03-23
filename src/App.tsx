@@ -592,6 +592,12 @@ export default function App() {
     return () => unsubscribe();
   }, []);
 
+  useEffect(() => {
+    if (isAuthReady && !user && view !== 'landing') {
+      setView('landing');
+    }
+  }, [user, isAuthReady, view]);
+
   const togglePhase = (id: number) => {
     setExpandedPhases(prev => ({
       ...prev,
@@ -602,7 +608,7 @@ export default function App() {
   if (view === 'landing') {
     return (
       <>
-        <LandingPage onStart={() => setView('app')} onShowAuth={() => setShowAuthModal(true)} user={user} />
+        <LandingPage onStart={() => user ? setView('app') : setShowAuthModal(true)} onShowAuth={() => setShowAuthModal(true)} user={user} />
         {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
       </>
     );
