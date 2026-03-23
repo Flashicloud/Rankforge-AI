@@ -544,7 +544,7 @@ function LandingPage({ onStart, onShowAuth, user }: { onStart: () => void, onSho
           
           <div className="border-t border-white/5 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-zinc-600 text-sm">
-              © {new Date().getFullYear()} RankForge AI. All rights reserved.
+              © 2026 RankForge AI. Developed by <a href="https://www.linkedin.com/in/kaleemullah1/" target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:text-indigo-300 transition-colors font-medium">Kaleem</a>
             </p>
             <div className="flex items-center gap-6">
               <span className="text-zinc-600 text-sm flex items-center gap-2">
