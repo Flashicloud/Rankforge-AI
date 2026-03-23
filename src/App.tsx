@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { generateSEOContent, optimizeSEOContent } from './services/gemini';
@@ -1177,7 +1177,7 @@ export default function App() {
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            navigator.clipboard.writeText(output.replace(/^## PHASE \d+ OUTPUT\n/, ''));
+                            navigator.clipboard.writeText(String(output).replace(/^## PHASE \d+ OUTPUT\n/, ''));
                             // Optional: Add visual feedback for this specific button if needed
                             // For now, using the global copied state or a simple alert might be confusing
                             // Let's just rely on the action. Or better, reuse the copied state logic but localised?
@@ -1215,7 +1215,7 @@ export default function App() {
                         <div className="p-6 max-h-[400px] overflow-y-auto custom-scrollbar bg-[#0a0a0a]">
                           <div className="markdown-body max-w-none dark-mode text-sm">
                             <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                              {output.replace(/^## PHASE \d+ OUTPUT\n/, '')}
+                              {String(output).replace(/^## PHASE \d+ OUTPUT\n/, '')}
                             </ReactMarkdown>
                           </div>
                         </div>
