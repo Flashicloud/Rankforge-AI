@@ -222,6 +222,10 @@ FINAL OUTPUT (IN THIS ORDER)
     "readability": 85,
     "intent_match": 90
   },
+  "readability_level": "8th Grade",
+  "nlp_entities": ["Entity 1", "Entity 2", "Entity 3"],
+  "content_gaps": ["Gap 1", "Gap 2"],
+  "eeat_signals": ["Signal 1", "Signal 2"],
   "improvements": [
     "Add more LSI keywords in H2s",
     "Improve introduction hook"
@@ -492,6 +496,10 @@ Overall SEO Score (Must be exactly in this JSON format at the very end:
     "readability": 85,
     "intent_match": 90
   },
+  "readability_level": "8th Grade",
+  "nlp_entities": ["Entity 1", "Entity 2", "Entity 3"],
+  "content_gaps": ["Gap 1", "Gap 2"],
+  "eeat_signals": ["Signal 1", "Signal 2"],
   "improvements": [
     "Add more LSI keywords in H2s",
     "Improve introduction hook"

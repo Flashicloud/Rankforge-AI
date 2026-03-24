@@ -19,6 +19,7 @@ import { onAuthStateChanged, User } from 'firebase/auth';
 import { collection, addDoc } from 'firebase/firestore';
 import Dashboard from './components/Dashboard';
 import AuthModal from './components/AuthModal';
+import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
 
 interface Option {
   value: string;
@@ -1314,81 +1315,160 @@ export default function App() {
               
               <div className="p-8 md:p-16 bg-[#111]">
                 {seoScore !== null && (
-                  <div className="mb-12 p-6 bg-zinc-900/50 border border-white/10 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6">
-                    <div className="flex-1">
-                      <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
-                        <Target className="w-5 h-5 text-indigo-400" />
-                        Advanced SEO Optimization Score
-                      </h3>
-                      <p className="text-zinc-400 text-sm max-w-md mb-4">
-                        This score reflects the article's alignment with search intent, semantic entity coverage, and E-E-A-T signals based on live SERP analysis.
-                      </p>
-                      
-                      {seoScore.breakdown && (
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 border-t border-white/10 pt-4">
-                          <div className="bg-black/30 p-3 rounded-lg border border-white/5">
-                            <div className="text-xs text-zinc-500 uppercase tracking-wider mb-1">Structure</div>
-                            <div className="text-lg font-bold text-white">{seoScore.breakdown.structure}/100</div>
+                  <div className="mb-12 space-y-6">
+                    <div className="p-6 bg-zinc-900/50 border border-white/10 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6">
+                      <div className="flex-1 w-full">
+                        <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
+                          <Target className="w-5 h-5 text-indigo-400" />
+                          Advanced SEO Optimization Score
+                        </h3>
+                        <p className="text-zinc-400 text-sm max-w-md mb-4">
+                          This score reflects the article's alignment with search intent, semantic entity coverage, and E-E-A-T signals based on live SERP analysis.
+                        </p>
+                        
+                        {seoScore.breakdown && (
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 border-t border-white/10 pt-4">
+                            <div className="bg-black/30 p-3 rounded-lg border border-white/5">
+                              <div className="text-xs text-zinc-500 uppercase tracking-wider mb-1">Structure</div>
+                              <div className="text-lg font-bold text-white">{seoScore.breakdown.structure}/100</div>
+                            </div>
+                            <div className="bg-black/30 p-3 rounded-lg border border-white/5">
+                              <div className="text-xs text-zinc-500 uppercase tracking-wider mb-1">Keywords</div>
+                              <div className="text-lg font-bold text-white">{seoScore.breakdown.keywords}/100</div>
+                            </div>
+                            <div className="bg-black/30 p-3 rounded-lg border border-white/5">
+                              <div className="text-xs text-zinc-500 uppercase tracking-wider mb-1">Readability</div>
+                              <div className="text-lg font-bold text-white">{seoScore.breakdown.readability}/100</div>
+                            </div>
+                            <div className="bg-black/30 p-3 rounded-lg border border-white/5">
+                              <div className="text-xs text-zinc-500 uppercase tracking-wider mb-1">Intent Match</div>
+                              <div className="text-lg font-bold text-white">{seoScore.breakdown.intent_match}/100</div>
+                            </div>
                           </div>
-                          <div className="bg-black/30 p-3 rounded-lg border border-white/5">
-                            <div className="text-xs text-zinc-500 uppercase tracking-wider mb-1">Keywords</div>
-                            <div className="text-lg font-bold text-white">{seoScore.breakdown.keywords}/100</div>
-                          </div>
-                          <div className="bg-black/30 p-3 rounded-lg border border-white/5">
-                            <div className="text-xs text-zinc-500 uppercase tracking-wider mb-1">Readability</div>
-                            <div className="text-lg font-bold text-white">{seoScore.breakdown.readability}/100</div>
-                          </div>
-                          <div className="bg-black/30 p-3 rounded-lg border border-white/5">
-                            <div className="text-xs text-zinc-500 uppercase tracking-wider mb-1">Intent Match</div>
-                            <div className="text-lg font-bold text-white">{seoScore.breakdown.intent_match}/100</div>
-                          </div>
+                        )}
+                      </div>
+                      <div className="relative w-32 h-32 flex-shrink-0 flex items-center justify-center">
+                        <svg className="w-full h-full transform -rotate-90 absolute inset-0" viewBox="0 0 100 100">
+                          <circle
+                            className="text-zinc-800 stroke-current"
+                            strokeWidth="8"
+                            cx="50"
+                            cy="50"
+                            r="42"
+                            fill="transparent"
+                          ></circle>
+                          <circle
+                            className={`${
+                              (seoScore.seo_score || seoScore) >= 80 ? 'text-emerald-500' : (seoScore.seo_score || seoScore) >= 60 ? 'text-amber-500' : 'text-rose-500'
+                            } stroke-current transition-all duration-1000 ease-out`}
+                            strokeWidth="8"
+                            strokeLinecap="round"
+                            cx="50"
+                            cy="50"
+                            r="42"
+                            fill="transparent"
+                            strokeDasharray="263.89"
+                            strokeDashoffset={263.89 - (263.89 * (seoScore.seo_score || seoScore)) / 100}
+                          ></circle>
+                        </svg>
+                        <div className="relative z-10 flex items-center justify-center flex-col">
+                          <span className="text-4xl font-black text-white tracking-tighter">{seoScore.seo_score || seoScore}</span>
+                          <span className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold mt-1">Score</span>
                         </div>
-                      )}
-                      
-                      {seoScore.improvements && seoScore.improvements.length > 0 && (
-                        <div className="mt-4">
-                          <div className="text-xs text-amber-400 uppercase tracking-wider mb-2 font-bold flex items-center gap-1">
-                            <AlertCircle className="w-3 h-3" /> Suggested Improvements
-                          </div>
-                          <ul className="space-y-1">
-                            {seoScore.improvements.map((imp: string, idx: number) => (
-                              <li key={idx} className="text-sm text-zinc-300 flex items-start gap-2">
-                                <span className="text-amber-500/50 mt-0.5">•</span> {imp}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                    </div>
-                    <div className="relative w-32 h-32 flex-shrink-0 flex items-center justify-center">
-                      <svg className="w-full h-full transform -rotate-90 absolute inset-0" viewBox="0 0 100 100">
-                        <circle
-                          className="text-zinc-800 stroke-current"
-                          strokeWidth="8"
-                          cx="50"
-                          cy="50"
-                          r="42"
-                          fill="transparent"
-                        ></circle>
-                        <circle
-                          className={`${
-                            (seoScore.seo_score || seoScore) >= 80 ? 'text-emerald-500' : (seoScore.seo_score || seoScore) >= 60 ? 'text-amber-500' : 'text-rose-500'
-                          } stroke-current transition-all duration-1000 ease-out`}
-                          strokeWidth="8"
-                          strokeLinecap="round"
-                          cx="50"
-                          cy="50"
-                          r="42"
-                          fill="transparent"
-                          strokeDasharray="263.89"
-                          strokeDashoffset={263.89 - (263.89 * (seoScore.seo_score || seoScore)) / 100}
-                        ></circle>
-                      </svg>
-                      <div className="relative z-10 flex items-center justify-center flex-col">
-                        <span className="text-4xl font-black text-white tracking-tighter">{seoScore.seo_score || seoScore}</span>
-                        <span className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold mt-1">Score</span>
                       </div>
                     </div>
+
+                    {seoScore.breakdown && (
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="md:col-span-1 p-6 bg-zinc-900/50 border border-white/10 rounded-2xl flex flex-col items-center justify-center min-h-[250px]">
+                          <h4 className="text-sm font-bold text-zinc-300 mb-4 uppercase tracking-widest w-full text-left">Score Radar</h4>
+                          <ResponsiveContainer width="100%" height="100%">
+                            <RadarChart cx="50%" cy="50%" outerRadius="70%" data={[
+                              { subject: 'Structure', A: seoScore.breakdown.structure, fullMark: 100 },
+                              { subject: 'Keywords', A: seoScore.breakdown.keywords, fullMark: 100 },
+                              { subject: 'Readability', A: seoScore.breakdown.readability, fullMark: 100 },
+                              { subject: 'Intent', A: seoScore.breakdown.intent_match, fullMark: 100 },
+                            ]}>
+                              <PolarGrid stroke="#333" />
+                              <PolarAngleAxis dataKey="subject" tick={{ fill: '#888', fontSize: 10 }} />
+                              <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
+                              <Radar name="Score" dataKey="A" stroke="#818cf8" fill="#818cf8" fillOpacity={0.5} />
+                            </RadarChart>
+                          </ResponsiveContainer>
+                        </div>
+
+                        <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          {seoScore.readability_level && (
+                            <div className="bg-zinc-900/50 p-5 rounded-2xl border border-white/10">
+                              <div className="text-xs text-indigo-400 uppercase tracking-wider mb-2 font-bold flex items-center gap-2">
+                                <FileText className="w-4 h-4" /> Readability Level
+                              </div>
+                              <div className="text-xl font-bold text-white">{seoScore.readability_level}</div>
+                            </div>
+                          )}
+                          
+                          {seoScore.nlp_entities && seoScore.nlp_entities.length > 0 && (
+                            <div className="bg-zinc-900/50 p-5 rounded-2xl border border-white/10">
+                              <div className="text-xs text-emerald-400 uppercase tracking-wider mb-2 font-bold flex items-center gap-2">
+                                <Network className="w-4 h-4" /> NLP Entities Detected
+                              </div>
+                              <div className="flex flex-wrap gap-2 mt-3">
+                                {seoScore.nlp_entities.map((entity: string, idx: number) => (
+                                  <span key={idx} className="px-2 py-1 bg-emerald-500/10 text-emerald-400 text-xs rounded-md border border-emerald-500/20">
+                                    {entity}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {seoScore.eeat_signals && seoScore.eeat_signals.length > 0 && (
+                            <div className="bg-zinc-900/50 p-5 rounded-2xl border border-white/10">
+                              <div className="text-xs text-blue-400 uppercase tracking-wider mb-2 font-bold flex items-center gap-2">
+                                <ShieldCheck className="w-4 h-4" /> E-E-A-T Signals
+                              </div>
+                              <ul className="space-y-1.5 mt-2">
+                                {seoScore.eeat_signals.map((signal: string, idx: number) => (
+                                  <li key={idx} className="text-xs text-zinc-300 flex items-start gap-2">
+                                    <Check className="w-3 h-3 text-blue-500 mt-0.5 flex-shrink-0" /> {signal}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                          {seoScore.content_gaps && seoScore.content_gaps.length > 0 && (
+                            <div className="bg-zinc-900/50 p-5 rounded-2xl border border-white/10">
+                              <div className="text-xs text-rose-400 uppercase tracking-wider mb-2 font-bold flex items-center gap-2">
+                                <ScanSearch className="w-4 h-4" /> Content Gaps
+                              </div>
+                              <ul className="space-y-1.5 mt-2">
+                                {seoScore.content_gaps.map((gap: string, idx: number) => (
+                                  <li key={idx} className="text-xs text-zinc-300 flex items-start gap-2">
+                                    <AlertCircle className="w-3 h-3 text-rose-500 mt-0.5 flex-shrink-0" /> {gap}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {seoScore.improvements && seoScore.improvements.length > 0 && (
+                      <div className="p-6 bg-zinc-900/50 border border-white/10 rounded-2xl">
+                        <div className="text-sm text-amber-400 uppercase tracking-wider mb-4 font-bold flex items-center gap-2">
+                          <AlertCircle className="w-4 h-4" /> Suggested Improvements
+                        </div>
+                        <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          {seoScore.improvements.map((imp: string, idx: number) => (
+                            <li key={idx} className="text-sm text-zinc-300 flex items-start gap-3 bg-black/20 p-3 rounded-lg border border-white/5">
+                              <span className="text-amber-500/50 mt-0.5 flex-shrink-0">•</span> {imp}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </div>
                 )}
                 

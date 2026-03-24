@@ -9,7 +9,7 @@ interface Article {
   userId: string;
   keyword: string;
   content: string;
-  seoScore?: number;
+  seoScore?: any;
   mode: 'generate' | 'optimize';
   createdAt: string;
 }
@@ -85,17 +85,74 @@ export default function Dashboard({ onViewArticle }: { onViewArticle: (article: 
     );
   }
 
+  const articlesWithScore = articles.filter(a => a.seoScore != null);
+  const averageScore = articlesWithScore.length > 0 
+    ? Math.round(articlesWithScore.reduce((acc, curr) => {
+        const score = typeof curr.seoScore === 'object' && curr.seoScore !== null 
+          ? (curr.seoScore as any).seo_score 
+          : curr.seoScore;
+        return acc + (score || 0);
+      }, 0) / articlesWithScore.length) 
+    : 0;
+    
+  const generatedCount = articles.filter(a => a.mode === 'generate').length;
+  const optimizedCount = articles.filter(a => a.mode === 'optimize').length;
+
   return (
     <div className="max-w-6xl mx-auto">
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-bold text-white mb-2">Your Articles</h2>
-          <p className="text-zinc-400">Manage and view your generated and optimized content.</p>
+          <h2 className="text-3xl font-bold text-white mb-2">Your Dashboard</h2>
+          <p className="text-zinc-400">Manage and analyze your AI-generated content.</p>
         </div>
-        <div className="bg-zinc-900/50 border border-white/5 rounded-lg px-4 py-2 flex items-center gap-2">
-          <FileText className="w-5 h-5 text-indigo-400" />
-          <span className="text-white font-medium">{articles.length} Total</span>
+      </div>
+
+      {articles.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-10">
+          <div className="bg-zinc-900/50 border border-white/5 rounded-2xl p-6 flex flex-col justify-between">
+            <div className="flex items-center gap-3 text-zinc-400 mb-4">
+              <FileText className="w-5 h-5 text-indigo-400" />
+              <span className="font-medium uppercase tracking-wider text-xs">Total Articles</span>
+            </div>
+            <div className="text-4xl font-black text-white">{articles.length}</div>
+          </div>
+          
+          <div className="bg-zinc-900/50 border border-white/5 rounded-2xl p-6 flex flex-col justify-between">
+            <div className="flex items-center gap-3 text-zinc-400 mb-4">
+              <Sparkles className="w-5 h-5 text-emerald-400" />
+              <span className="font-medium uppercase tracking-wider text-xs">Avg SEO Score</span>
+            </div>
+            <div className="flex items-end gap-2">
+              <div className={`text-4xl font-black ${averageScore >= 80 ? 'text-emerald-400' : averageScore >= 60 ? 'text-amber-400' : 'text-rose-400'}`}>
+                {averageScore}
+              </div>
+              <div className="text-zinc-500 text-sm mb-1">/ 100</div>
+            </div>
+          </div>
+
+          <div className="md:col-span-2 bg-zinc-900/50 border border-white/5 rounded-2xl p-6 flex flex-col justify-between relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 blur-3xl rounded-full -mr-10 -mt-10"></div>
+            <div className="flex items-center gap-3 text-zinc-400 mb-4 relative z-10">
+              <FileEdit className="w-5 h-5 text-blue-400" />
+              <span className="font-medium uppercase tracking-wider text-xs">Content Distribution</span>
+            </div>
+            <div className="flex items-center gap-8 relative z-10">
+              <div>
+                <div className="text-2xl font-bold text-white mb-1">{generatedCount}</div>
+                <div className="text-xs text-zinc-500 uppercase tracking-wider">Generated</div>
+              </div>
+              <div className="w-px h-10 bg-white/10"></div>
+              <div>
+                <div className="text-2xl font-bold text-white mb-1">{optimizedCount}</div>
+                <div className="text-xs text-zinc-500 uppercase tracking-wider">Optimized</div>
+              </div>
+            </div>
+          </div>
         </div>
+      )}
+
+      <div className="mb-6 flex items-center justify-between">
+        <h3 className="text-xl font-bold text-white">Recent Documents</h3>
       </div>
 
       {articles.length === 0 ? (
@@ -144,10 +201,13 @@ export default function Dashboard({ onViewArticle }: { onViewArticle: (article: 
                   <Clock className="w-4 h-4" />
                   {new Date(article.createdAt).toLocaleDateString()}
                 </div>
-                {article.seoScore !== undefined && (
+                {article.seoScore != null && (
                   <div className="flex items-center gap-1.5 ml-auto">
-                    <div className={`w-2 h-2 rounded-full ${article.seoScore >= 80 ? 'bg-emerald-500' : article.seoScore >= 60 ? 'bg-amber-500' : 'bg-red-500'}`}></div>
-                    Score: {article.seoScore}
+                    <div className={`w-2 h-2 rounded-full ${
+                      (typeof article.seoScore === 'object' && article.seoScore !== null ? (article.seoScore as any).seo_score : article.seoScore) >= 80 ? 'bg-emerald-500' : 
+                      (typeof article.seoScore === 'object' && article.seoScore !== null ? (article.seoScore as any).seo_score : article.seoScore) >= 60 ? 'bg-amber-500' : 'bg-red-500'
+                    }`}></div>
+                    Score: {typeof article.seoScore === 'object' && article.seoScore !== null ? (article.seoScore as any).seo_score : article.seoScore}
                   </div>
                 )}
               </div>

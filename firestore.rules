@@ -35,10 +35,14 @@ service cloud.firestore {
       return hasRequiredFields(['userId', 'keyword', 'content', 'mode', 'createdAt']) &&
              request.resource.data.userId == userId &&
              request.resource.data.keyword is string && request.resource.data.keyword.size() > 0 && request.resource.data.keyword.size() < 500 &&
-             request.resource.data.content is string && request.resource.data.content.size() > 0 && request.resource.data.content.size() < 100000 &&
+             request.resource.data.content is string && request.resource.data.content.size() >= 0 && request.resource.data.content.size() < 500000 &&
              request.resource.data.mode in ['generate', 'optimize'] &&
              request.resource.data.createdAt is string &&
-             (!('seoScore' in request.resource.data) || (request.resource.data.seoScore is number && request.resource.data.seoScore >= 0 && request.resource.data.seoScore <= 100));
+             (!('seoScore' in request.resource.data) || 
+               request.resource.data.seoScore == null ||
+               (request.resource.data.seoScore is number && request.resource.data.seoScore >= 0 && request.resource.data.seoScore <= 100) ||
+               (request.resource.data.seoScore is map)
+             );
     }
 
     match /users/{userId}/articles/{articleId} {
