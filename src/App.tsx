@@ -19,6 +19,7 @@ import { onAuthStateChanged, User } from 'firebase/auth';
 import { collection, addDoc } from 'firebase/firestore';
 import Dashboard from './components/Dashboard';
 import AuthModal from './components/AuthModal';
+import StickyAssistant from './components/StickyAssistant';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
 
 interface Option {
@@ -581,6 +582,7 @@ export default function App() {
   const [expandedPhases, setExpandedPhases] = useState<Record<number, boolean>>({});
   const [seoScore, setSeoScore] = useState<any>(null);
   const [editableContent, setEditableContent] = useState('');
+  const [isHighlighted, setIsHighlighted] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -750,6 +752,69 @@ export default function App() {
       setIsGenerating(false);
       setStatusMessage('');
     }
+  };
+
+  const handleHighlight = () => {
+    if (!editableContent) return;
+    
+    const div = document.createElement('div');
+    div.innerHTML = editableContent;
+    
+    // Check if already highlighted
+    const existingHighlights = div.querySelectorAll('.highlight-long');
+    if (existingHighlights.length > 0) {
+      // Remove highlights
+      existingHighlights.forEach(el => {
+        const parent = el.parentNode;
+        if (parent) {
+          while (el.firstChild) parent.insertBefore(el.firstChild, el);
+          parent.removeChild(el);
+        }
+      });
+      setEditableContent(div.innerHTML);
+      setIsHighlighted(false);
+      return;
+    }
+    
+    const textNodes: Node[] = [];
+    const walk = document.createTreeWalker(div, NodeFilter.SHOW_TEXT, null);
+    let node;
+    while ((node = walk.nextNode())) {
+      textNodes.push(node);
+    }
+    
+    textNodes.forEach((textNode) => {
+      const text = textNode.textContent || '';
+      if (!text.trim()) return;
+      
+      // Split by sentences (approximated by punctuation followed by space)
+      const parts = text.split(/([.?!]+[\s]+)/);
+      let newHtml = '';
+      let changed = false;
+      
+      for (let i = 0; i < parts.length; i++) {
+        const part = parts[i];
+        const wordCount = part.trim().split(/\s+/).length;
+        
+        // If it's a long sentence (e.g., > 20 words) and not just punctuation
+        if (wordCount > 20 && !part.match(/^[.?!]+[\s]+$/)) {
+          newHtml += `<span style="background-color: #fef08a; color: #854d0e;" class="highlight-long">${part}</span>`;
+          changed = true;
+        } else {
+          // Escape HTML to prevent XSS or broken tags
+          newHtml += part.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+      }
+      
+      if (changed && textNode.parentNode) {
+        const span = document.createElement('span');
+        span.innerHTML = newHtml;
+        textNode.parentNode.replaceChild(span, textNode);
+      }
+    });
+    
+    setEditableContent(div.innerHTML);
+    setIsHighlighted(true);
   };
 
   const handleCopy = () => {
@@ -1313,7 +1378,8 @@ export default function App() {
                 </div>
               </div>
               
-              <div className="p-8 md:p-16 bg-[#111]">
+              <div className="p-8 md:p-16 bg-[#111] grid grid-cols-1 xl:grid-cols-4 gap-8">
+                <div className="xl:col-span-3">
                 {seoScore !== null && (
                   <div className="mb-12 space-y-6">
                     <div className="p-6 bg-zinc-900/50 border border-white/10 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6">
@@ -1487,6 +1553,16 @@ export default function App() {
                       ]
                     }}
                     className="min-h-[500px]"
+                  />
+                </div>
+                </div>
+                <div className="xl:col-span-1 self-start sticky top-24">
+                  <StickyAssistant 
+                    content={editableContent} 
+                    targetKeyword={keyword} 
+                    seoScore={seoScore} 
+                    onHighlight={handleHighlight}
+                    isHighlighted={isHighlighted}
                   />
                 </div>
               </div>

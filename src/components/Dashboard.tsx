@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { collection, query, where, orderBy, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 import { db, auth } from '../services/firebase';
-import { FileText, Trash2, Clock, Search, Sparkles, FileEdit, AlertCircle } from 'lucide-react';
-import { motion } from 'motion/react';
+import { FileText, Trash2, Clock, Search, Sparkles, FileEdit, AlertCircle, Download, FileDown, FileCode2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+import html2pdf from 'html2pdf.js';
+import { saveAs } from 'file-saver';
+import { marked } from 'marked';
+import WordPressExportModal from './WordPressExportModal';
 
 interface Article {
   id: string;
@@ -20,6 +24,9 @@ export default function Dashboard({ onViewArticle }: { onViewArticle: (article: 
   const [error, setError] = useState<string | null>(null);
   const [articleToDelete, setArticleToDelete] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [exportMenuOpen, setExportMenuOpen] = useState<string | null>(null);
+  const [wpModalOpen, setWpModalOpen] = useState(false);
+  const [selectedArticleForWp, setSelectedArticleForWp] = useState<{title: string, content: string} | null>(null);
 
   useEffect(() => {
     if (!auth.currentUser) {
@@ -60,6 +67,42 @@ export default function Dashboard({ onViewArticle }: { onViewArticle: (article: 
       setError('Failed to delete article.');
     } finally {
       setIsDeleting(false);
+    }
+  };
+
+  const handleExport = async (article: Article, format: 'pdf' | 'word' | 'wp', e: React.MouseEvent) => {
+    e.stopPropagation();
+    setExportMenuOpen(null);
+    
+    const htmlContent = await marked.parse(article.content);
+    const styledHtml = `
+      <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 20px;">
+        <h1 style="color: #111; border-bottom: 1px solid #eee; padding-bottom: 10px;">${article.keyword}</h1>
+        ${htmlContent}
+      </div>
+    `;
+
+    if (format === 'pdf') {
+      const element = document.createElement('div');
+      element.innerHTML = styledHtml;
+      html2pdf().set({
+        margin: 10,
+        filename: `${article.keyword.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      }).from(element).save();
+    } else if (format === 'word') {
+      const blob = new Blob(['\ufeff', styledHtml], {
+        type: 'application/msword'
+      });
+      saveAs(blob, `${article.keyword.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.doc`);
+    } else if (format === 'wp') {
+      setSelectedArticleForWp({
+        title: article.keyword,
+        content: htmlContent
+      });
+      setWpModalOpen(true);
     }
   };
 
@@ -180,16 +223,55 @@ export default function Dashboard({ onViewArticle }: { onViewArticle: (article: 
                 <div className={`p-2 rounded-lg ${article.mode === 'generate' ? 'bg-indigo-500/10 text-indigo-400' : 'bg-emerald-500/10 text-emerald-400'}`}>
                   {article.mode === 'generate' ? <Sparkles className="w-5 h-5" /> : <FileEdit className="w-5 h-5" />}
                 </div>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setArticleToDelete(article.id);
-                  }}
-                  className="text-zinc-500 hover:text-red-400 transition-colors p-2 hover:bg-red-400/10 rounded-lg opacity-0 group-hover:opacity-100"
-                  title="Delete Article"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
+                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity relative">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setExportMenuOpen(exportMenuOpen === article.id ? null : article.id);
+                    }}
+                    className="text-zinc-500 hover:text-indigo-400 transition-colors p-2 hover:bg-indigo-400/10 rounded-lg"
+                    title="Export Article"
+                  >
+                    <Download className="w-4 h-4" />
+                  </button>
+                  
+                  <AnimatePresence>
+                    {exportMenuOpen === article.id && (
+                      <>
+                        <div className="fixed inset-0 z-40" onClick={(e) => { e.stopPropagation(); setExportMenuOpen(null); }} />
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                          animate={{ opacity: 1, scale: 1, y: 0 }}
+                          exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                          className="absolute right-0 top-10 z-50 w-48 bg-zinc-900 border border-white/10 rounded-xl shadow-2xl overflow-hidden backdrop-blur-xl"
+                        >
+                          <div className="p-1">
+                            <button onClick={(e) => handleExport(article, 'pdf', e)} className="w-full text-left px-3 py-2 text-sm text-zinc-300 hover:text-white hover:bg-white/5 rounded-lg flex items-center gap-2">
+                              <FileText className="w-4 h-4 text-red-400" /> Export as PDF
+                            </button>
+                            <button onClick={(e) => handleExport(article, 'word', e)} className="w-full text-left px-3 py-2 text-sm text-zinc-300 hover:text-white hover:bg-white/5 rounded-lg flex items-center gap-2">
+                              <FileDown className="w-4 h-4 text-blue-400" /> Export as Word
+                            </button>
+                            <button onClick={(e) => handleExport(article, 'wp', e)} className="w-full text-left px-3 py-2 text-sm text-zinc-300 hover:text-white hover:bg-white/5 rounded-lg flex items-center gap-2">
+                              <FileCode2 className="w-4 h-4 text-indigo-400" /> Send to WordPress
+                            </button>
+                          </div>
+                        </motion.div>
+                      </>
+                    )}
+                  </AnimatePresence>
+
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setArticleToDelete(article.id);
+                    }}
+                    className="text-zinc-500 hover:text-red-400 transition-colors p-2 hover:bg-red-400/10 rounded-lg"
+                    title="Delete Article"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
               
               <h3 className="text-lg font-bold text-white mb-2 line-clamp-2" title={article.keyword}>
@@ -252,6 +334,15 @@ export default function Dashboard({ onViewArticle }: { onViewArticle: (article: 
           </motion.div>
         </div>
       )}
+
+      <WordPressExportModal
+        isOpen={wpModalOpen}
+        onClose={() => {
+          setWpModalOpen(false);
+          setSelectedArticleForWp(null);
+        }}
+        article={selectedArticleForWp}
+      />
     </div>
   );
 }
