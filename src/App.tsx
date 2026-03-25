@@ -19,7 +19,6 @@ import { onAuthStateChanged, User } from 'firebase/auth';
 import { collection, addDoc } from 'firebase/firestore';
 import Dashboard from './components/Dashboard';
 import AuthModal from './components/AuthModal';
-import StickyAssistant from './components/StickyAssistant';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
 
 interface Option {
@@ -561,6 +560,29 @@ function LandingPage({ onStart, onShowAuth, user }: { onStart: () => void, onSho
   );
 }
 
+export const extractArticleAndResearch = (fullText: string, currentMode: 'generate' | 'optimize') => {
+  let research = fullText;
+  let article = fullText;
+
+  if (currentMode === 'generate') {
+    // Look for Phase 5 Output
+    const phase5Match = fullText.match(/(?:^|\n)(?:## |### )?(?:PHASE 5|5\.)[^\n]*\n([\s\S]*?)(?:(?:^|\n)(?:## |### )?(?:PHASE 6|6\.)|$)/i);
+    if (phase5Match) {
+      article = phase5Match[1].trim();
+      research = fullText.replace(phase5Match[0], '\n\n> **[Final Article Content Moved to "Final Article" Tab]**\n\n').trim();
+    }
+  } else {
+    // Optimize mode: Article is usually in Phase 7
+    const phase7Match = fullText.match(/(?:^|\n)(?:## |### )?(?:PHASE 7|7\.)[^\n]*\n([\s\S]*?)(?:(?:^|\n)(?:## |### )?(?:PHASE 8|8\.)|$)/i);
+    if (phase7Match) {
+      article = phase7Match[1].trim();
+      research = fullText.replace(phase7Match[0], '\n\n> **[Optimized Article Content Moved to "Final Article" Tab]**\n\n').trim();
+    }
+  }
+
+  return { article, research };
+};
+
 export default function App() {
   const [view, setView] = useState<'landing' | 'app' | 'dashboard'>('landing');
   const [user, setUser] = useState<User | null>(null);
@@ -570,6 +592,8 @@ export default function App() {
   const [existingArticle, setExistingArticle] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [content, setContent] = useState<string | null>(null);
+  const [researchContent, setResearchContent] = useState<string>('');
+  const [activeTab, setActiveTab] = useState<'article' | 'research'>('article');
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string>('');
@@ -582,7 +606,6 @@ export default function App() {
   const [expandedPhases, setExpandedPhases] = useState<Record<number, boolean>>({});
   const [seoScore, setSeoScore] = useState<any>(null);
   const [editableContent, setEditableContent] = useState('');
-  const [isHighlighted, setIsHighlighted] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -681,12 +704,16 @@ export default function App() {
               finalContent = finalContent.replace(/\[SEO_SCORE:\s*\d+\]/, '').trim();
             }
         }
+        
+        const { article, research } = extractArticleAndResearch(finalContent, 'generate');
         setContent(finalContent);
+        setResearchContent(research);
         
         // Convert Markdown to HTML for the Rich Text Editor
-        const html = await marked.parse(finalContent);
+        const html = await marked.parse(article);
         const cleanHtml = DOMPurify.sanitize(html);
         setEditableContent(cleanHtml);
+        setActiveTab('article');
       } else {
         const result = await optimizeSEOContent(keyword, existingArticle, contentType, additionalContext, brandVoice, (status) => {
           setStatusMessage(status);
@@ -720,12 +747,16 @@ export default function App() {
               finalContent = finalContent.replace(/\[SEO_SCORE:\s*\d+\]/, '').trim();
             }
         }
+        
+        const { article, research } = extractArticleAndResearch(finalContent, 'optimize');
         setContent(finalContent);
+        setResearchContent(research);
         
         // Convert Markdown to HTML for the Rich Text Editor
-        const html = await marked.parse(finalContent);
+        const html = await marked.parse(article);
         const cleanHtml = DOMPurify.sanitize(html);
         setEditableContent(cleanHtml);
+        setActiveTab('article');
       }
 
       // Auto-save to dashboard
@@ -754,69 +785,6 @@ export default function App() {
     }
   };
 
-  const handleHighlight = () => {
-    if (!editableContent) return;
-    
-    const div = document.createElement('div');
-    div.innerHTML = editableContent;
-    
-    // Check if already highlighted
-    const existingHighlights = div.querySelectorAll('.highlight-long');
-    if (existingHighlights.length > 0) {
-      // Remove highlights
-      existingHighlights.forEach(el => {
-        const parent = el.parentNode;
-        if (parent) {
-          while (el.firstChild) parent.insertBefore(el.firstChild, el);
-          parent.removeChild(el);
-        }
-      });
-      setEditableContent(div.innerHTML);
-      setIsHighlighted(false);
-      return;
-    }
-    
-    const textNodes: Node[] = [];
-    const walk = document.createTreeWalker(div, NodeFilter.SHOW_TEXT, null);
-    let node;
-    while ((node = walk.nextNode())) {
-      textNodes.push(node);
-    }
-    
-    textNodes.forEach((textNode) => {
-      const text = textNode.textContent || '';
-      if (!text.trim()) return;
-      
-      // Split by sentences (approximated by punctuation followed by space)
-      const parts = text.split(/([.?!]+[\s]+)/);
-      let newHtml = '';
-      let changed = false;
-      
-      for (let i = 0; i < parts.length; i++) {
-        const part = parts[i];
-        const wordCount = part.trim().split(/\s+/).length;
-        
-        // If it's a long sentence (e.g., > 20 words) and not just punctuation
-        if (wordCount > 20 && !part.match(/^[.?!]+[\s]+$/)) {
-          newHtml += `<span style="background-color: #fef08a; color: #854d0e;" class="highlight-long">${part}</span>`;
-          changed = true;
-        } else {
-          // Escape HTML to prevent XSS or broken tags
-          newHtml += part.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        }
-      }
-      
-      if (changed && textNode.parentNode) {
-        const span = document.createElement('span');
-        span.innerHTML = newHtml;
-        textNode.parentNode.replaceChild(span, textNode);
-      }
-    });
-    
-    setEditableContent(div.innerHTML);
-    setIsHighlighted(true);
-  };
-
   const handleCopy = () => {
     if (editableContent) {
       const turndownService = new TurndownService();
@@ -825,7 +793,8 @@ export default function App() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } else if (content) {
-      navigator.clipboard.writeText(content);
+      const { article } = extractArticleAndResearch(content, mode);
+      navigator.clipboard.writeText(article);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
@@ -1216,8 +1185,8 @@ export default function App() {
           </div>
         )}
 
-        {/* Phase Outputs Grid - Always Visible if there are outputs */}
-        {Object.keys(phaseOutputs).length > 0 && (
+        {/* Phase Outputs Grid - Visible during generation */}
+        {Object.keys(phaseOutputs).length > 0 && isGenerating && (
           <div className="space-y-6 w-full max-w-5xl mx-auto mb-12 mt-12">
             {Object.entries(phaseOutputs).map(([id, output]) => {
               const phaseId = parseInt(id);
@@ -1378,8 +1347,7 @@ export default function App() {
                 </div>
               </div>
               
-              <div className="p-8 md:p-16 bg-[#111] grid grid-cols-1 xl:grid-cols-4 gap-8">
-                <div className="xl:col-span-3">
+              <div className="p-8 md:p-16 bg-[#111]">
                 {seoScore !== null && (
                   <div className="mb-12 space-y-6">
                     <div className="p-6 bg-zinc-900/50 border border-white/10 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6">
@@ -1538,33 +1506,48 @@ export default function App() {
                   </div>
                 )}
                 
-                <div className="bg-white text-black rounded-xl overflow-hidden shadow-sm border border-white/10">
-                  <ReactQuill 
-                    theme="snow" 
-                    value={editableContent} 
-                    onChange={setEditableContent}
-                    modules={{
-                      toolbar: [
-                        [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-                        ['bold', 'italic', 'underline', 'strike'],
-                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                        ['link', 'image', 'blockquote', 'code-block'],
-                        ['clean']
-                      ]
-                    }}
-                    className="min-h-[500px]"
-                  />
+                <div className="flex items-center gap-2 mb-6 border-b border-white/10 pb-4">
+                  <button 
+                    onClick={() => setActiveTab('article')}
+                    className={`px-6 py-3 rounded-xl font-bold transition-all flex items-center gap-2 ${activeTab === 'article' ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/25' : 'bg-zinc-900/50 text-zinc-400 hover:text-white hover:bg-white/10 border border-white/5'}`}
+                  >
+                    <PenTool className="w-4 h-4" />
+                    Final Article
+                  </button>
+                  <button 
+                    onClick={() => setActiveTab('research')}
+                    className={`px-6 py-3 rounded-xl font-bold transition-all flex items-center gap-2 ${activeTab === 'research' ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/25' : 'bg-zinc-900/50 text-zinc-400 hover:text-white hover:bg-white/10 border border-white/5'}`}
+                  >
+                    <BrainCircuit className="w-4 h-4" />
+                    Research & Strategy
+                  </button>
                 </div>
-                </div>
-                <div className="xl:col-span-1 self-start sticky top-24">
-                  <StickyAssistant 
-                    content={editableContent} 
-                    targetKeyword={keyword} 
-                    seoScore={seoScore} 
-                    onHighlight={handleHighlight}
-                    isHighlighted={isHighlighted}
-                  />
-                </div>
+
+                {activeTab === 'article' ? (
+                  <div className="bg-white text-black rounded-xl overflow-hidden shadow-sm border border-white/10">
+                    <ReactQuill 
+                      theme="snow" 
+                      value={editableContent} 
+                      onChange={setEditableContent}
+                      modules={{
+                        toolbar: [
+                          [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                          ['bold', 'italic', 'underline', 'strike'],
+                          [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                          ['link', 'image', 'blockquote', 'code-block'],
+                          ['clean']
+                        ]
+                      }}
+                      className="min-h-[500px]"
+                    />
+                  </div>
+                ) : (
+                  <div className="bg-zinc-900 border border-white/10 rounded-xl p-8 prose prose-invert max-w-none custom-scrollbar overflow-y-auto max-h-[800px]">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                      {researchContent || "No research data available."}
+                    </ReactMarkdown>
+                  </div>
+                )}
               </div>
             </div>
           </motion.div>

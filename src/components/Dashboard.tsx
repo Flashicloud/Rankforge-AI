@@ -7,6 +7,7 @@ import html2pdf from 'html2pdf.js';
 import { saveAs } from 'file-saver';
 import { marked } from 'marked';
 import WordPressExportModal from './WordPressExportModal';
+import { extractArticleAndResearch } from '../App';
 
 interface Article {
   id: string;
@@ -74,7 +75,9 @@ export default function Dashboard({ onViewArticle }: { onViewArticle: (article: 
     e.stopPropagation();
     setExportMenuOpen(null);
     
-    const htmlContent = await marked.parse(article.content);
+    const { article: finalArticleContent } = extractArticleAndResearch(article.content, article.mode || 'generate');
+    
+    const htmlContent = await marked.parse(finalArticleContent);
     const styledHtml = `
       <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 20px;">
         <h1 style="color: #111; border-bottom: 1px solid #eee; padding-bottom: 10px;">${article.keyword}</h1>
