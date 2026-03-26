@@ -7,7 +7,7 @@ import React, { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { generateSEOContent, optimizeSEOContent } from './services/gemini';
-import { Search, Sparkles, FileText, AlertCircle, Copy, Check, Loader2, Layers, BarChart3, Target, Network, ShieldCheck, PenTool, ScanSearch, Zap, ChevronDown, ChevronUp, TrendingUp, BrainCircuit, Fingerprint, ArrowRight, Terminal, FileEdit, Brain, Globe, LogIn, LogOut, LayoutDashboard, Save, X } from 'lucide-react';
+import { Search, Sparkles, FileText, AlertCircle, Copy, Check, Loader2, Layers, BarChart3, Target, Network, ShieldCheck, PenTool, ScanSearch, Zap, ChevronDown, ChevronUp, TrendingUp, BrainCircuit, Fingerprint, ArrowRight, Terminal, FileEdit, Brain, Globe, LogIn, LogOut, LayoutDashboard, Save, X, Menu } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import ReactQuill from 'react-quill-new';
 import 'react-quill/dist/quill.snow.css';
@@ -35,13 +35,13 @@ const CustomSelect = ({ value, onChange, options, placeholder, disabled }: { val
       <button
         type="button"
         onClick={() => !disabled && setIsOpen(!isOpen)}
-        className={`block w-full text-left p-3 pr-10 bg-black/20 border border-white/5 rounded-lg text-white focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 text-sm transition-colors ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-black/40 cursor-pointer'}`}
+        className={`block w-full text-left p-3.5 pr-10 bg-black/30 backdrop-blur-md border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-sm transition-all shadow-inner ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white/5 hover:border-white/20 cursor-pointer'}`}
       >
-        <span className={selectedOption && selectedOption.value !== '' ? 'text-white' : 'text-zinc-500'}>
+        <span className={selectedOption && selectedOption.value !== '' ? 'text-white font-medium' : 'text-zinc-500'}>
           {selectedOption ? selectedOption.label : placeholder}
         </span>
-        <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
-          <ChevronDown className={`w-4 h-4 text-zinc-500 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+        <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none">
+          <ChevronDown className={`w-4 h-4 text-zinc-400 transition-transform duration-300 ${isOpen ? 'rotate-180 text-white' : ''}`} />
         </div>
       </button>
 
@@ -53,10 +53,10 @@ const CustomSelect = ({ value, onChange, options, placeholder, disabled }: { val
               initial={{ opacity: 0, y: -10, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.95 }}
-              transition={{ duration: 0.15, ease: "easeOut" }}
-              className="absolute z-50 w-full mt-2 bg-zinc-900 border border-white/10 rounded-xl shadow-2xl overflow-hidden backdrop-blur-xl"
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              className="absolute z-50 w-full mt-2 bg-zinc-900/95 border border-white/10 rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)] overflow-hidden backdrop-blur-2xl ring-1 ring-white/5"
             >
-              <div className="max-h-60 overflow-y-auto custom-scrollbar py-1">
+              <div className="max-h-64 overflow-y-auto custom-scrollbar p-1.5">
                 {options.map((option) => (
                   <button
                     key={option.value}
@@ -65,7 +65,7 @@ const CustomSelect = ({ value, onChange, options, placeholder, disabled }: { val
                       onChange(option.value);
                       setIsOpen(false);
                     }}
-                    className={`block w-full text-left px-4 py-2.5 text-sm transition-colors ${value === option.value ? 'bg-indigo-500/20 text-indigo-300 font-medium' : 'text-zinc-300 hover:bg-white/5 hover:text-white'}`}
+                    className={`block w-full text-left px-4 py-3 text-sm rounded-lg transition-all duration-200 ${value === option.value ? 'bg-indigo-500/20 text-indigo-300 font-bold' : 'text-zinc-300 hover:bg-white/10 hover:text-white font-medium'}`}
                   >
                     {option.label}
                   </button>
@@ -80,103 +80,251 @@ const CustomSelect = ({ value, onChange, options, placeholder, disabled }: { val
 };
 
 function LandingPage({ onStart, onShowAuth, user }: { onStart: () => void, onShowAuth: () => void, user: User | null }) {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const marqueeItems = [
+    { icon: Globe, label: 'Live SERP Analysis' },
+    { icon: BrainCircuit, label: 'Semantic Entity Mapping' },
+    { icon: ShieldCheck, label: 'E-E-A-T Compliant' },
+    { icon: Target, label: 'Search Intent Alignment' },
+    { icon: TrendingUp, label: 'NLP Optimization' },
+    { icon: Fingerprint, label: 'Anti-AI Footprint' },
+    { icon: ScanSearch, label: 'AI Overview Readiness' },
+    { icon: Zap, label: 'Instant Content Generation' },
+    { icon: Globe, label: 'Live SERP Analysis' },
+    { icon: BrainCircuit, label: 'Semantic Entity Mapping' },
+    { icon: ShieldCheck, label: 'E-E-A-T Compliant' },
+    { icon: Target, label: 'Search Intent Alignment' },
+    { icon: TrendingUp, label: 'NLP Optimization' },
+    { icon: Fingerprint, label: 'Anti-AI Footprint' },
+    { icon: ScanSearch, label: 'AI Overview Readiness' },
+    { icon: Zap, label: 'Instant Content Generation' },
+  ];
+
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-zinc-50 selection:bg-indigo-500/30 font-sans overflow-x-hidden">
+    <div className="min-h-screen bg-[#080810] text-zinc-50 selection:bg-indigo-500/30 font-sans overflow-x-hidden">
+
       {/* Navbar */}
-      <nav className="border-b border-white/5 bg-black/20 backdrop-blur-md fixed top-0 w-full z-50">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+      <nav className="border-b border-white/[0.06] bg-[#080810]/80 backdrop-blur-xl fixed top-0 w-full z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="relative group">
-              <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg blur opacity-60 group-hover:opacity-100 transition duration-200"></div>
-              <div className="relative bg-black p-2 rounded-lg">
-                <Brain className="w-6 h-6 text-indigo-400" />
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl blur opacity-50 group-hover:opacity-90 transition duration-300"></div>
+              <div className="relative bg-[#0e0e1a] p-2 rounded-xl border border-white/10">
+                <Brain className="w-5 h-5 text-indigo-400" />
               </div>
             </div>
-            <span className="text-xl font-bold tracking-wide text-white">RankForge AI</span>
+            <div>
+              <span className="text-lg font-bold tracking-tight text-white">RankForge AI</span>
+              <span className="ml-2 text-[10px] font-bold uppercase tracking-widest text-indigo-400 opacity-70 hidden sm:inline">Beta</span>
+            </div>
           </div>
-          <div className="flex items-center gap-4">
+
+          <div className="hidden md:flex items-center gap-8">
+            <a href="#features" className="text-sm text-zinc-400 hover:text-white transition-colors font-medium">Features</a>
+            <a href="#how-it-works" className="text-sm text-zinc-400 hover:text-white transition-colors font-medium">How it Works</a>
+            <a href="#pricing" className="text-sm text-zinc-400 hover:text-white transition-colors font-medium">Pricing</a>
+          </div>
+
+          <div className="hidden md:flex items-center gap-3">
             {!user ? (
-              <button onClick={onShowAuth} className="text-zinc-400 hover:text-white font-medium transition-colors">
+              <button onClick={onShowAuth} className="text-sm text-zinc-400 hover:text-white font-medium transition-colors px-4 py-2 rounded-lg hover:bg-white/5">
                 Sign In
               </button>
             ) : (
               <span className="text-zinc-400 text-sm hidden sm:block">
-                Logged in as <strong className="text-white">{user.email}</strong>
+                <strong className="text-white">{user.email}</strong>
               </span>
             )}
-            <button onClick={onStart} className="bg-white/10 hover:bg-white/20 text-white px-6 py-2.5 rounded-lg font-medium transition-all">
-              Go to App
+            <button onClick={onStart} className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-all shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/40 flex items-center gap-2">
+              Go to App <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
+          {/* Mobile Menu Button */}
+          <div className="md:hidden flex items-center">
+            <button 
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="p-2 text-zinc-400 hover:text-white focus:outline-none"
+            >
+              {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
         </div>
+
+        {/* Mobile Menu Dropdown */}
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="md:hidden bg-[#0e0e1a] border-b border-white/[0.06] overflow-hidden"
+            >
+              <div className="px-4 pt-2 pb-6 flex flex-col gap-4">
+                <a href="#features" onClick={() => setIsMobileMenuOpen(false)} className="text-base text-zinc-300 hover:text-white font-medium py-2">Features</a>
+                <a href="#how-it-works" onClick={() => setIsMobileMenuOpen(false)} className="text-base text-zinc-300 hover:text-white font-medium py-2">How it Works</a>
+                <a href="#pricing" onClick={() => setIsMobileMenuOpen(false)} className="text-base text-zinc-300 hover:text-white font-medium py-2">Pricing</a>
+                
+                <div className="h-px bg-white/10 my-2"></div>
+                
+                {!user ? (
+                  <button onClick={() => { onShowAuth(); setIsMobileMenuOpen(false); }} className="text-base text-left text-zinc-300 hover:text-white font-medium py-2">
+                    Sign In
+                  </button>
+                ) : (
+                  <span className="text-zinc-400 text-sm py-2">
+                    Signed in as <strong className="text-white">{user.email}</strong>
+                  </span>
+                )}
+                <button onClick={() => { onStart(); setIsMobileMenuOpen(false); }} className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-5 py-3 rounded-xl font-semibold text-base flex items-center justify-center gap-2 mt-2">
+                  Go to App <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
 
       {/* Hero Section */}
-      <div className="relative pt-40 pb-20 lg:pt-56 lg:pb-32 overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-indigo-500/20 rounded-full blur-[120px] opacity-50 pointer-events-none"></div>
-        <div className="max-w-7xl mx-auto px-6 relative z-10 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-sm font-medium mb-8">
-            <Brain className="w-4 h-4" />
+      <div className="relative pt-28 pb-16 sm:pt-36 sm:pb-20 lg:pt-48 lg:pb-28 overflow-hidden bg-grid">
+        {/* Ambient blobs */}
+        <div className="absolute top-0 left-1/4 w-[300px] sm:w-[600px] h-[300px] sm:h-[600px] bg-indigo-600/20 rounded-full blur-[80px] sm:blur-[130px] opacity-60 pointer-events-none"></div>
+        <div className="absolute top-20 right-1/4 w-[200px] sm:w-[400px] h-[200px] sm:h-[400px] bg-purple-600/15 rounded-full blur-[60px] sm:blur-[100px] opacity-50 pointer-events-none"></div>
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[400px] sm:w-[800px] h-[150px] sm:h-[300px] bg-indigo-900/20 rounded-full blur-[50px] sm:blur-[80px] pointer-events-none"></div>
+
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 relative z-10 text-center">
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/25 text-indigo-300 text-[10px] sm:text-xs font-semibold mb-6 sm:mb-8 uppercase tracking-widest">
+            <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse inline-block"></span>
             The Next Generation of SEO Content
           </div>
-          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-8 leading-tight">
-            The Ultimate <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400">AI Article Writer</span><br/> for SEO Dominance
+
+          {/* Headline */}
+          <h1 className="text-4xl sm:text-5xl md:text-[72px] font-black tracking-tight mb-5 sm:mb-7 leading-[1.1] sm:leading-[1.05]">
+            The Ultimate{' '}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400">
+              AI Article Writer
+            </span>
+            <br />
+            for SEO Dominance
           </h1>
-          <p className="text-xl text-zinc-400 max-w-3xl mx-auto mb-12 leading-relaxed">
-            RankForge is not just another text generator. It's a comprehensive <strong>AI SEO content generator</strong> that analyzes live search results, maps semantic entities, and writes human-quality articles designed to rank on Google.
+
+          <p className="text-base sm:text-lg md:text-xl text-zinc-400 max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed font-light px-2 sm:px-0">
+            Not another text generator. A comprehensive <span className="text-white font-medium">AI SEO content engine</span> that analyzes live SERPs, maps semantic entities, and writes human-quality articles built to rank on Google.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <button onClick={onStart} className="bg-white text-black hover:bg-indigo-50 px-8 py-4 rounded-full font-bold text-lg transition-all flex items-center gap-2 shadow-[0_0_40px_rgba(99,102,241,0.3)] hover:shadow-[0_0_60px_rgba(99,102,241,0.5)] hover:scale-105">
+
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+            <button
+              onClick={onStart}
+              className="shimmer-btn px-8 py-4 rounded-2xl font-bold text-lg transition-all flex items-center gap-2.5 shadow-[0_0_50px_rgba(99,102,241,0.35)] hover:shadow-[0_0_70px_rgba(99,102,241,0.5)] hover:scale-[1.02]"
+            >
               Start Writing for Free <ArrowRight className="w-5 h-5" />
             </button>
+            <button
+              onClick={onShowAuth}
+              className="px-8 py-4 rounded-2xl font-semibold text-lg text-zinc-300 hover:text-white border border-white/10 hover:border-white/25 bg-white/[0.03] hover:bg-white/[0.07] transition-all flex items-center gap-2"
+            >
+              View Demo
+            </button>
+          </div>
+
+          {/* Stats Row */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-8 sm:gap-16 pt-8 border-t border-white/5">
+            <div className="text-center">
+              <div className="text-3xl font-black text-white stat-number">7<span className="text-indigo-400">-Phase</span></div>
+              <div className="text-xs text-zinc-500 uppercase tracking-widest mt-1">Semantic Engine</div>
+            </div>
+            <div className="hidden sm:block w-px h-10 bg-white/10"></div>
+            <div className="text-center">
+              <div className="text-3xl font-black text-white stat-number">98<span className="text-purple-400">%</span></div>
+              <div className="text-xs text-zinc-500 uppercase tracking-widest mt-1">Human Score Rate</div>
+            </div>
+            <div className="hidden sm:block w-px h-10 bg-white/10"></div>
+            <div className="text-center">
+              <div className="text-3xl font-black text-white stat-number">3<span className="text-pink-400">x</span></div>
+              <div className="text-xs text-zinc-500 uppercase tracking-widest mt-1">More Organic Traffic</div>
+            </div>
+            <div className="hidden sm:block w-px h-10 bg-white/10"></div>
+            <div className="text-center">
+              <div className="text-3xl font-black text-white stat-number">10<span className="text-indigo-400">k+</span></div>
+              <div className="text-xs text-zinc-500 uppercase tracking-widest mt-1">Articles Generated</div>
+            </div>
           </div>
         </div>
       </div>
 
+      {/* Marquee Ticker */}
+      <div className="py-5 border-y border-white/[0.06] bg-white/[0.02] marquee-wrapper">
+        <div className="marquee-track">
+          {marqueeItems.map((item, i) => (
+            <div key={i} className="flex items-center gap-2.5 px-8 text-zinc-400 whitespace-nowrap">
+              <item.icon className="w-4 h-4 text-indigo-400 flex-shrink-0" />
+              <span className="text-sm font-medium">{item.label}</span>
+              <span className="ml-8 text-white/10">•</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Features Section */}
-      <div className="py-24 bg-zinc-900/30 border-y border-white/5">
+      <div id="features" className="py-28 bg-[#080810]">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Why Choose Our AI Writing Assistant?</h2>
-            <p className="text-zinc-400 max-w-2xl mx-auto">Built for SEO professionals, marketers, and content creators who demand quality over quantity.</p>
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-zinc-400 text-xs font-semibold uppercase tracking-widest mb-5">
+              Core Capabilities
+            </div>
+            <h2 className="text-4xl md:text-5xl font-black text-white mb-5 tracking-tight">Why Choose Our AI Writing Assistant?</h2>
+            <p className="text-zinc-400 max-w-xl mx-auto text-lg">Built for SEO professionals and content creators who demand quality over quantity.</p>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-[#0a0a0a] p-8 rounded-3xl border border-white/5 hover:border-indigo-500/30 transition-colors group">
-              <div className="w-14 h-14 bg-indigo-500/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Card 1 */}
+            <div className="gradient-border card-glow group cursor-default p-8">
+              <div className="w-14 h-14 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-indigo-500/20 group-hover:scale-110 transition-all duration-300">
                 <Globe className="w-7 h-7 text-indigo-400" />
               </div>
-              <h3 className="text-xl font-bold mb-3">Live SERP Analysis</h3>
-              <p className="text-zinc-400 leading-relaxed">Our <strong>AI article writer</strong> doesn't guess. It scrapes the top 10 Google results in real-time to understand exactly what search intent to target.</p>
-            </div>
-            
-            <div className="bg-[#0a0a0a] p-8 rounded-3xl border border-white/5 hover:border-purple-500/30 transition-colors group">
-              <div className="w-14 h-14 bg-purple-500/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <TrendingUp className="w-7 h-7 text-purple-400" />
-              </div>
-              <h3 className="text-xl font-bold mb-3">Surfer-Level NLP Pipeline</h3>
-              <p className="text-zinc-400 leading-relaxed">Our premium engine acts like Surfer SEO on autopilot. It injects missing semantic entities, LSI keywords, and optimizes NLP scores to boost your topical authority.</p>
+              <div className="text-[10px] font-bold uppercase tracking-widest text-indigo-400 mb-2">Feature 01</div>
+              <h3 className="text-xl font-bold mb-3 text-white">Live SERP Analysis</h3>
+              <p className="text-zinc-500 leading-relaxed text-sm">Our <strong className="text-zinc-300">AI article writer</strong> doesn't guess. It scrapes the top results in real-time to understand exactly what search intent to target.</p>
             </div>
 
-            <div className="bg-[#0a0a0a] p-8 rounded-3xl border border-white/5 hover:border-pink-500/30 transition-colors group">
-              <div className="w-14 h-14 bg-pink-500/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+            {/* Card 2 */}
+            <div className="gradient-border card-glow group cursor-default p-8" style={{background: '#111118'}}>
+              <div className="w-14 h-14 bg-purple-500/10 border border-purple-500/20 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-purple-500/20 group-hover:scale-110 transition-all duration-300">
+                <TrendingUp className="w-7 h-7 text-purple-400" />
+              </div>
+              <div className="text-[10px] font-bold uppercase tracking-widest text-purple-400 mb-2">Feature 02</div>
+              <h3 className="text-xl font-bold mb-3 text-white">Surfer-Level NLP Pipeline</h3>
+              <p className="text-zinc-500 leading-relaxed text-sm">Acts like Surfer SEO on autopilot. Injects missing semantic entities, LSI keywords, and optimizes NLP scores to boost your topical authority.</p>
+            </div>
+
+            {/* Card 3 */}
+            <div className="gradient-border card-glow group cursor-default p-8">
+              <div className="w-14 h-14 bg-pink-500/10 border border-pink-500/20 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-pink-500/20 group-hover:scale-110 transition-all duration-300">
                 <ShieldCheck className="w-7 h-7 text-pink-400" />
               </div>
-              <h3 className="text-xl font-bold mb-3">E-E-A-T Compliant</h3>
-              <p className="text-zinc-400 leading-relaxed">Unlike basic <strong>AI content generators</strong>, RankForge structures content to highlight Experience, Expertise, Authoritativeness, and Trustworthiness.</p>
+              <div className="text-[10px] font-bold uppercase tracking-widest text-pink-400 mb-2">Feature 03</div>
+              <h3 className="text-xl font-bold mb-3 text-white">E-E-A-T Compliant</h3>
+              <p className="text-zinc-500 leading-relaxed text-sm">Unlike basic AI generators, RankForge structures content to highlight Experience, Expertise, Authoritativeness, and Trustworthiness.</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Professional Landing Page Content */}
-      <div className="mt-20 pt-24 border-t border-white/5 max-w-7xl mx-auto px-6">
+      <div className="pt-20 pb-4 border-t border-white/[0.06] bg-[#0a0a12] max-w-full">
+      <div className="max-w-7xl mx-auto px-6">
         <div className="text-center max-w-3xl mx-auto mb-20">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6 tracking-tight">
-            Beyond Standard AI. <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">Engineered for the SERPs.</span>
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-zinc-400 text-xs font-semibold uppercase tracking-widest mb-5">
+            Deep Dive
+          </div>
+          <h2 className="text-4xl md:text-5xl font-black text-white mb-6 tracking-tight">
+            Beyond Standard AI.{' '}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">Engineered for the SERPs.</span>
           </h2>
           <p className="text-zinc-400 text-lg leading-relaxed">
-            Stop publishing generic AI content that gets penalized by Google. Whether you're generating net-new articles with our 7-phase semantic engine or rescuing underperforming pages with our 8-phase optimization architect, we build human-first, intent-optimized content that search engines reward.
+            Stop publishing generic AI content penalized by Google. Whether generating new articles or rescuing underperforming pages, we build human-first, intent-optimized content that search engines reward.
           </p>
         </div>
 
@@ -259,9 +407,11 @@ function LandingPage({ onStart, onShowAuth, user }: { onStart: () => void, onSho
           </div>
         </div>
       </div>
+      </div>
 
       {/* How It Works Section */}
-      <div className="py-24 max-w-7xl mx-auto px-6">
+      <div id="how-it-works" className="py-24 bg-[#080810]">
+      <div className="max-w-7xl mx-auto px-6">
         <div className="flex items-center gap-4 mb-16 justify-center">
           <div className="h-px bg-gradient-to-r from-transparent to-white/10 w-16 md:w-32"></div>
           <h3 className="text-xl font-bold text-white uppercase tracking-widest text-center">How It Works</h3>
@@ -356,124 +506,126 @@ function LandingPage({ onStart, onShowAuth, user }: { onStart: () => void, onSho
           </div>
         </div>
       </div>
+      </div>
 
       {/* Pricing Section */}
-      <div className="py-24 bg-zinc-900/30 border-y border-white/5">
+      <div id="pricing" className="py-24 bg-[#0a0a12] border-y border-white/[0.06]">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Simple, Transparent Pricing</h2>
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-zinc-400 text-xs font-semibold uppercase tracking-widest mb-5">
+              Pricing
+            </div>
+            <h2 className="text-4xl md:text-5xl font-black text-white mb-4 tracking-tight">Simple, Transparent Pricing</h2>
             <p className="text-zinc-400 text-lg max-w-2xl mx-auto">
               Generate high-ranking SEO content at a fraction of the cost of traditional agencies. Choose the plan that fits your growth.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto items-stretch">
             {/* Free Plan */}
-            <div className="bg-[#111] border border-white/10 rounded-3xl p-8 hover:border-indigo-500/30 transition-all flex flex-col">
-              <h3 className="text-xl font-bold text-white mb-2">Free</h3>
-              <p className="text-zinc-400 text-sm mb-6">Test the waters and see the quality.</p>
+            <div className="bg-[#111118] border border-white/[0.07] rounded-3xl p-7 hover:border-white/20 transition-all duration-300 flex flex-col group">
               <div className="mb-6">
-                <span className="text-4xl font-bold text-white">$0</span>
-                <span className="text-zinc-500">/month</span>
+                <div className="text-xs font-bold uppercase tracking-widest text-zinc-500 mb-3">Free</div>
+                <h3 className="text-4xl font-black text-white">$0<span className="text-xl font-medium text-zinc-500 ml-1">/mo</span></h3>
+                <p className="text-zinc-500 text-sm mt-2">Test the waters and see the quality.</p>
               </div>
-              <ul className="space-y-4 mb-8 flex-1">
-                <li className="flex items-start gap-3 text-zinc-300 text-sm">
-                  <Check className="w-5 h-5 text-emerald-400 flex-shrink-0" />
-                  <span><strong>1</strong> Article per month</span>
+              <div className="h-px bg-white/[0.06] mb-6"></div>
+              <ul className="space-y-3.5 mb-8 flex-1">
+                <li className="flex items-center gap-3 text-zinc-400 text-sm">
+                  <div className="w-5 h-5 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center flex-shrink-0">
+                    <Check className="w-3 h-3 text-emerald-400" />
+                  </div>
+                  <span><strong className="text-zinc-200">1</strong> Article per month</span>
                 </li>
-                <li className="flex items-start gap-3 text-zinc-300 text-sm">
-                  <Check className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+                <li className="flex items-center gap-3 text-zinc-400 text-sm">
+                  <div className="w-5 h-5 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center flex-shrink-0">
+                    <Check className="w-3 h-3 text-emerald-400" />
+                  </div>
                   <span>Basic SEO Scoring</span>
                 </li>
-                <li className="flex items-start gap-3 text-zinc-300 text-sm">
-                  <Check className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+                <li className="flex items-center gap-3 text-zinc-400 text-sm">
+                  <div className="w-5 h-5 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center flex-shrink-0">
+                    <Check className="w-3 h-3 text-emerald-400" />
+                  </div>
                   <span>Content Optimization Tool</span>
                 </li>
-                <li className="flex items-start gap-3 text-zinc-500 text-sm">
-                  <X className="w-5 h-5 flex-shrink-0" />
+                <li className="flex items-center gap-3 text-zinc-600 text-sm line-through">
+                  <div className="w-5 h-5 rounded-full bg-white/5 flex items-center justify-center flex-shrink-0">
+                    <X className="w-3 h-3 text-zinc-600" />
+                  </div>
                   <span>Auto-Save to Dashboard</span>
                 </li>
               </ul>
-              <button 
+              <button
                 onClick={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); user ? onStart() : onShowAuth(); }}
-                className="w-full py-3 rounded-xl font-bold text-white bg-white/5 hover:bg-white/10 border border-white/10 transition-all"
+                className="w-full py-3 rounded-xl font-semibold text-sm text-zinc-300 hover:text-white bg-white/[0.05] hover:bg-white/10 border border-white/[0.08] hover:border-white/20 transition-all"
               >
-                Get Started
+                Get Started Free
               </button>
             </div>
 
-            {/* Starter Plan */}
-            <div className="bg-gradient-to-b from-indigo-900/40 to-[#111] border border-indigo-500/50 rounded-3xl p-8 transform md:-translate-y-4 shadow-2xl shadow-indigo-500/10 flex flex-col relative">
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-indigo-500 text-white text-xs font-bold uppercase tracking-wider py-1 px-3 rounded-full">
-                Most Popular
+            {/* Starter Plan — Most Popular */}
+            <div className="relative rounded-3xl p-[1px] flex-col" style={{background: 'linear-gradient(135deg, #6366f1, #a855f7, #6366f1)'}}>
+              <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10">
+                <div className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-[10px] font-black uppercase tracking-widest py-1 px-4 rounded-full shadow-lg shadow-indigo-500/30">
+                  Most Popular
+                </div>
               </div>
-              <h3 className="text-xl font-bold text-white mb-2">Starter</h3>
-              <p className="text-indigo-200/70 text-sm mb-6">Perfect for bloggers and small sites.</p>
-              <div className="mb-6">
-                <span className="text-4xl font-bold text-white">$9</span>
-                <span className="text-zinc-500">/month</span>
+              <div className="bg-[#13131f] rounded-[calc(1.5rem-1px)] p-7 flex flex-col h-full">
+                <div className="mb-6">
+                  <div className="text-xs font-bold uppercase tracking-widest text-indigo-400 mb-3">Starter</div>
+                  <h3 className="text-4xl font-black text-white">$9<span className="text-xl font-medium text-zinc-500 ml-1">/mo</span></h3>
+                  <p className="text-zinc-400 text-sm mt-2">Perfect for bloggers and small sites.</p>
+                </div>
+                <div className="h-px bg-white/10 mb-6"></div>
+                <ul className="space-y-3.5 mb-8 flex-1">
+                  {['10 Articles per month', 'Advanced SEO Scoring & Analysis', 'Auto-Save to Dashboard', 'Priority Email Support'].map((item, i) => (
+                    <li key={i} className="flex items-center gap-3 text-zinc-300 text-sm">
+                      <div className="w-5 h-5 rounded-full bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center flex-shrink-0">
+                        <Check className="w-3 h-3 text-indigo-400" />
+                      </div>
+                      <span dangerouslySetInnerHTML={{__html: i === 0 ? '<strong class="text-white">10</strong> Articles per month' : item}} />
+                    </li>
+                  ))}
+                </ul>
+                <button
+                  onClick={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); user ? onStart() : onShowAuth(); }}
+                  className="w-full py-3 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 shadow-lg shadow-indigo-500/20 transition-all hover:shadow-indigo-500/40"
+                >
+                  Start Free Trial
+                </button>
               </div>
-              <ul className="space-y-4 mb-8 flex-1">
-                <li className="flex items-start gap-3 text-zinc-300 text-sm">
-                  <Check className="w-5 h-5 text-indigo-400 flex-shrink-0" />
-                  <span><strong>10</strong> Articles per month</span>
-                </li>
-                <li className="flex items-start gap-3 text-zinc-300 text-sm">
-                  <Check className="w-5 h-5 text-indigo-400 flex-shrink-0" />
-                  <span>Advanced SEO Scoring & Analysis</span>
-                </li>
-                <li className="flex items-start gap-3 text-zinc-300 text-sm">
-                  <Check className="w-5 h-5 text-indigo-400 flex-shrink-0" />
-                  <span>Auto-Save to Dashboard</span>
-                </li>
-                <li className="flex items-start gap-3 text-zinc-300 text-sm">
-                  <Check className="w-5 h-5 text-indigo-400 flex-shrink-0" />
-                  <span>Priority Email Support</span>
-                </li>
-              </ul>
-              <button 
-                onClick={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); user ? onStart() : onShowAuth(); }}
-                className="w-full py-3 rounded-xl font-bold text-white bg-indigo-500 hover:bg-indigo-600 shadow-lg shadow-indigo-500/25 transition-all"
-              >
-                Start Starter Trial
-              </button>
             </div>
 
             {/* Pro Plan */}
-            <div className="bg-[#111] border border-white/10 rounded-3xl p-8 hover:border-indigo-500/30 transition-all flex flex-col">
-              <h3 className="text-xl font-bold text-white mb-2">Pro</h3>
-              <p className="text-zinc-400 text-sm mb-6">For serious marketers and niche sites.</p>
+            <div className="bg-[#111118] border border-white/[0.07] rounded-3xl p-7 hover:border-white/20 transition-all duration-300 flex flex-col group">
               <div className="mb-6">
-                <span className="text-4xl font-bold text-white">$29</span>
-                <span className="text-zinc-500">/month</span>
+                <div className="text-xs font-bold uppercase tracking-widest text-zinc-500 mb-3">Pro</div>
+                <h3 className="text-4xl font-black text-white">$29<span className="text-xl font-medium text-zinc-500 ml-1">/mo</span></h3>
+                <p className="text-zinc-500 text-sm mt-2">For serious marketers and niche sites.</p>
               </div>
-              <ul className="space-y-4 mb-8 flex-1">
-                <li className="flex items-start gap-3 text-zinc-300 text-sm">
-                  <Check className="w-5 h-5 text-emerald-400 flex-shrink-0" />
-                  <span><strong>50</strong> Articles per month</span>
-                </li>
-                <li className="flex items-start gap-3 text-zinc-300 text-sm">
-                  <Check className="w-5 h-5 text-emerald-400 flex-shrink-0" />
-                  <span><strong>Surfer-Level NLP Pipeline</strong></span>
-                </li>
-                <li className="flex items-start gap-3 text-zinc-300 text-sm">
-                  <Check className="w-5 h-5 text-emerald-400 flex-shrink-0" />
-                  <span>Custom Brand Voice</span>
-                </li>
-                <li className="flex items-start gap-3 text-zinc-300 text-sm">
-                  <Check className="w-5 h-5 text-emerald-400 flex-shrink-0" />
-                  <span>API Access</span>
-                </li>
-                <li className="flex items-start gap-3 text-zinc-300 text-sm">
-                  <Check className="w-5 h-5 text-emerald-400 flex-shrink-0" />
-                  <span>24/7 Dedicated Support</span>
-                </li>
+              <div className="h-px bg-white/[0.06] mb-6"></div>
+              <ul className="space-y-3.5 mb-8 flex-1">
+                {[
+                  { label: '<strong class="text-zinc-200">50</strong> Articles per month', ok: true },
+                  { label: '<strong class="text-zinc-200">Surfer-Level NLP Pipeline</strong>', ok: true },
+                  { label: 'Custom Brand Voice', ok: true },
+                  { label: 'API Access', ok: true },
+                  { label: '24/7 Dedicated Support', ok: true },
+                ].map((item, i) => (
+                  <li key={i} className="flex items-center gap-3 text-zinc-400 text-sm">
+                    <div className="w-5 h-5 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center flex-shrink-0">
+                      <Check className="w-3 h-3 text-emerald-400" />
+                    </div>
+                    <span dangerouslySetInnerHTML={{__html: item.label}} />
+                  </li>
+                ))}
               </ul>
-              <button 
+              <button
                 onClick={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); user ? onStart() : onShowAuth(); }}
-                className="w-full py-3 rounded-xl font-bold text-white bg-white/5 hover:bg-white/10 border border-white/10 transition-all"
+                className="w-full py-3 rounded-xl font-semibold text-sm text-zinc-300 hover:text-white bg-white/[0.05] hover:bg-white/10 border border-white/[0.08] hover:border-white/20 transition-all"
               >
-                Get Pro
+                Get Pro Access
               </button>
             </div>
           </div>
@@ -481,30 +633,40 @@ function LandingPage({ onStart, onShowAuth, user }: { onStart: () => void, onSho
       </div>
 
       {/* CTA Section */}
-      <div className="py-24 max-w-7xl mx-auto px-6">
-        <div className="bg-gradient-to-br from-indigo-900/20 to-purple-900/20 border border-indigo-500/20 rounded-3xl p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden">
-          <div className="absolute top-0 right-0 -mt-10 -mr-10 text-indigo-500/10">
-            <Terminal className="w-64 h-64" />
-          </div>
-          <div className="relative z-10 max-w-2xl">
-            <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">Ready to scale your organic traffic?</h3>
-            <p className="text-indigo-200/80 text-lg mb-0">
-              Join forward-thinking SEOs, niche site builders, and SaaS content teams who are leaving generic AI writers behind.
-            </p>
-          </div>
-          <div className="relative z-10 flex-shrink-0">
-            <button 
-              onClick={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); onStart(); }}
-              className="bg-white text-black hover:bg-indigo-50 px-8 py-4 rounded-xl font-bold text-lg transition-all flex items-center gap-2"
-            >
-              Try RankForge AI <ArrowRight className="w-5 h-5" />
-            </button>
+      <div className="py-24 px-6">
+        <div className="max-w-5xl mx-auto">
+          <div className="relative overflow-hidden rounded-3xl p-[1px]" style={{background: 'linear-gradient(135deg, rgba(99,102,241,0.5) 0%, rgba(168,85,247,0.3) 50%, rgba(99,102,241,0.2) 100%)'}}>
+            <div className="bg-[#0e0e1c] rounded-[calc(1.5rem-1px)] p-10 md:p-14 flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden">
+              {/* background blob */}
+              <div className="absolute top-0 right-0 w-80 h-80 bg-indigo-500/10 rounded-full blur-[80px] pointer-events-none"></div>
+              <div className="absolute bottom-0 left-0 w-60 h-60 bg-purple-500/10 rounded-full blur-[60px] pointer-events-none"></div>
+
+              <div className="relative z-10 max-w-xl">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold uppercase tracking-widest mb-5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse inline-block"></span>
+                  Ready to Rank
+                </div>
+                <h3 className="text-3xl md:text-4xl font-black text-white mb-4 leading-tight tracking-tight">Ready to scale your organic traffic?</h3>
+                <p className="text-zinc-400 text-lg leading-relaxed">
+                  Join forward-thinking SEOs, niche site builders, and SaaS content teams who are leaving generic AI writers behind.
+                </p>
+              </div>
+              <div className="relative z-10 flex-shrink-0 flex flex-col gap-3 items-center">
+                <button
+                  onClick={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); onStart(); }}
+                  className="shimmer-btn px-8 py-4 rounded-2xl font-bold text-lg transition-all flex items-center gap-2.5 hover:scale-105 shadow-[0_0_40px_rgba(99,102,241,0.3)]"
+                >
+                  Try RankForge AI <ArrowRight className="w-5 h-5" />
+                </button>
+                <span className="text-zinc-600 text-xs">No credit card required</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Footer */}
-      <footer className="border-t border-white/5 bg-[#050505] pt-16 pb-8 mt-auto relative z-10">
+      <footer className="border-t border-white/[0.06] bg-[#050508] pt-16 pb-8 mt-auto relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
             <div className="col-span-1 md:col-span-2">
@@ -824,44 +986,42 @@ export default function App() {
   const currentPhases = mode === 'generate' ? generatePhases : optimizePhases;
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white font-sans selection:bg-indigo-500/30 selection:text-indigo-200 overflow-x-hidden">
+    <div className="min-h-screen bg-[#080810] text-white font-sans selection:bg-indigo-500/30 selection:text-indigo-200 overflow-x-hidden">
       {/* Ambient Background */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-indigo-600/20 rounded-full blur-[120px] opacity-40" />
-        <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-purple-600/20 rounded-full blur-[120px] opacity-40" />
+      <div className="fixed inset-0 pointer-events-none bg-dot">
+        <div className="absolute top-[-15%] left-[-5%] w-[45%] h-[45%] bg-indigo-600/15 rounded-full blur-[130px]" />
+        <div className="absolute bottom-[-15%] right-[-5%] w-[40%] h-[40%] bg-purple-600/12 rounded-full blur-[120px]" />
       </div>
 
       {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-white/5 bg-[#0a0a0a]/80 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-4">
+      <header className="sticky top-0 z-50 border-b border-white/[0.06] bg-[#080810]/85 backdrop-blur-xl">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-3">
             <div className="relative group">
-              <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg blur opacity-60 group-hover:opacity-100 transition duration-200"></div>
-              <div className="relative bg-black p-2 rounded-lg">
-                <Brain className="w-6 h-6 text-indigo-400" />
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl blur opacity-50 group-hover:opacity-90 transition duration-300"></div>
+              <div className="relative bg-[#0e0e1a] p-2 rounded-xl border border-white/10">
+                <Brain className="w-5 h-5 text-indigo-400" />
               </div>
             </div>
             <div>
-              <h1 className="text-xl font-bold tracking-tight text-white leading-none">
-                RankForge AI
-              </h1>
-              <span className="text-xs font-medium text-indigo-400 tracking-widest uppercase opacity-80">Semantic Content Engine</span>
+              <h1 className="text-lg font-bold tracking-tight text-white leading-none">RankForge AI</h1>
+              <span className="text-[10px] font-semibold text-indigo-400 tracking-widest uppercase opacity-70">Semantic Content Engine</span>
             </div>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             {isAuthReady && (
               user ? (
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setView(view === 'dashboard' ? 'app' : 'dashboard')}
-                    className="text-xs font-medium text-white transition-colors px-4 py-2 rounded-full bg-indigo-500 hover:bg-indigo-600 flex items-center gap-2"
+                    className="text-xs font-semibold text-white transition-all px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 shadow-lg shadow-indigo-500/20 flex items-center gap-2"
                   >
-                    {view === 'dashboard' ? <Brain className="w-3 h-3" /> : <LayoutDashboard className="w-3 h-3" />}
+                    {view === 'dashboard' ? <Brain className="w-3.5 h-3.5" /> : <LayoutDashboard className="w-3.5 h-3.5" />}
                     {view === 'dashboard' ? 'Back to App' : 'Dashboard'}
                   </button>
                   <button
                     onClick={logOut}
-                    className="text-xs font-medium text-zinc-400 hover:text-white transition-colors p-2 rounded-full border border-white/10 hover:border-white/20 hover:bg-white/5 flex items-center justify-center"
+                    className="text-xs font-medium text-zinc-400 hover:text-white transition-colors p-2 rounded-xl border border-white/10 hover:border-white/20 hover:bg-white/5 flex items-center justify-center"
                     title="Sign Out"
                   >
                     <LogOut className="w-4 h-4" />
@@ -870,9 +1030,9 @@ export default function App() {
               ) : (
                 <button
                   onClick={() => setShowAuthModal(true)}
-                  className="text-xs font-medium text-white transition-colors px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 flex items-center gap-2"
+                  className="text-xs font-semibold text-white transition-all px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 hover:border-white/20 flex items-center gap-2"
                 >
-                  <LogIn className="w-3 h-3" />
+                  <LogIn className="w-3.5 h-3.5" />
                   Sign In
                 </button>
               )
@@ -901,19 +1061,19 @@ export default function App() {
           <>
         {/* Mode Switcher */}
         {!content && !isGenerating && (
-          <div className="flex justify-center mb-8">
-            <div className="flex bg-zinc-900/80 p-1.5 rounded-xl border border-white/5 backdrop-blur-sm">
+          <div className="flex justify-center mb-10">
+            <div className="flex bg-[#0e0e1a] p-1.5 rounded-2xl border border-white/[0.07] shadow-xl">
               <button
                 onClick={() => { setMode('generate'); setContent(null); setError(null); }}
-                className={`flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-bold transition-all ${mode === 'generate' ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/25' : 'text-zinc-400 hover:text-white hover:bg-white/5'}`}
+                className={`flex items-center gap-2.5 px-7 py-3 rounded-xl text-sm font-bold transition-all duration-200 ${mode === 'generate' ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/25' : 'text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.05]'}`}
               >
                 <Brain className="w-4 h-4" /> Generate New Article
               </button>
               <button
                 onClick={() => { setMode('optimize'); setContent(null); setError(null); }}
-                className={`flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-bold transition-all ${mode === 'optimize' ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/25' : 'text-zinc-400 hover:text-white hover:bg-white/5'}`}
+                className={`flex items-center gap-2.5 px-7 py-3 rounded-xl text-sm font-bold transition-all duration-200 ${mode === 'optimize' ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/25' : 'text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.05]'}`}
               >
-                <FileEdit className="w-4 h-4" /> Optimize Existing Article
+                <FileEdit className="w-4 h-4" /> Optimize Existing
               </button>
             </div>
           </div>
@@ -941,8 +1101,8 @@ export default function App() {
             </p>
 
             <div className="relative group w-full">
-              <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-500"></div>
-              <form onSubmit={handleSubmit} className="relative bg-zinc-900 rounded-xl p-4 flex flex-col gap-4 shadow-2xl">
+              <div className="absolute -inset-[1px] bg-gradient-to-r from-indigo-500/50 via-purple-500/30 to-pink-500/20 rounded-2xl opacity-60 group-hover:opacity-100 transition duration-500"></div>
+              <form onSubmit={handleSubmit} className="relative bg-[#0e0e1a] rounded-2xl p-5 flex flex-col gap-4 shadow-2xl border border-white/[0.04]">
                 <div className="flex flex-col md:flex-row gap-2">
                   <div className="relative flex-grow">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -953,7 +1113,7 @@ export default function App() {
                       value={keyword}
                       onChange={(e) => setKeyword(e.target.value)}
                       placeholder="Enter target keyword (e.g., 'enterprise saas pricing strategies')"
-                      className={`block w-full pl-12 pr-4 py-4 bg-black/20 border border-white/5 rounded-lg text-white placeholder:text-zinc-600 focus:ring-1 ${mode === 'generate' ? 'focus:ring-indigo-500' : 'focus:ring-emerald-500'} text-lg font-medium`}
+                      className={`block w-full pl-12 pr-4 py-4 bg-black/30 border border-white/[0.07] rounded-xl text-white placeholder:text-zinc-600 focus:ring-1 focus:border-transparent ${mode === 'generate' ? 'focus:ring-indigo-500' : 'focus:ring-emerald-500'} text-base font-medium transition-all`}
                       disabled={isGenerating}
                       required
                     />
@@ -961,7 +1121,7 @@ export default function App() {
                   <button
                     type="submit"
                     disabled={isGenerating || !keyword.trim() || (mode === 'optimize' && !existingArticle.trim())}
-                    className={`bg-white text-black ${mode === 'generate' ? 'hover:bg-indigo-50' : 'hover:bg-emerald-50'} px-8 py-4 rounded-lg font-bold text-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 min-w-[160px]`}
+                    className={`${mode === 'generate' ? 'bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 shadow-indigo-500/25' : 'bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 shadow-emerald-500/25'} text-white px-8 py-4 rounded-xl font-bold text-base transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 min-w-[155px] shadow-lg hover:scale-[1.02]`}
                   >
                     {isGenerating ? (
                       <>
@@ -971,7 +1131,7 @@ export default function App() {
                     ) : (
                       <>
                         {mode === 'generate' ? 'Generate' : 'Optimize'}
-                        {mode === 'generate' ? <Zap className="w-5 h-5 fill-black" /> : <FileEdit className="w-5 h-5 fill-black" />}
+                        {mode === 'generate' ? <Zap className="w-5 h-5" /> : <FileEdit className="w-5 h-5" />}
                       </>
                     )}
                   </button>
@@ -987,7 +1147,7 @@ export default function App() {
                       value={existingArticle}
                       onChange={(e) => setExistingArticle(e.target.value)}
                       placeholder="Paste your existing article content here..."
-                      className="block w-full p-4 bg-black/20 border border-white/5 rounded-lg text-white placeholder:text-zinc-600 focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 text-sm resize-y min-h-[200px] custom-scrollbar"
+                      className="block w-full p-4 bg-black/30 border border-white/[0.07] rounded-xl text-white placeholder:text-zinc-600 focus:ring-1 focus:ring-emerald-500 text-sm resize-y min-h-[200px] custom-scrollbar transition-all"
                       disabled={isGenerating}
                       required
                     />
@@ -995,7 +1155,7 @@ export default function App() {
                 )}
 
                 {/* Content Configuration Section */}
-                <div className="pt-4 border-t border-white/5">
+                <div className="pt-4 border-t border-white/[0.06]">
                   <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-4 flex items-center gap-2">
                     <Layers className="w-3 h-3" /> Content Configuration
                   </h3>
@@ -1049,7 +1209,7 @@ export default function App() {
                       value={additionalContext}
                       onChange={(e) => setAdditionalContext(e.target.value)}
                       placeholder="Example:&#10;- Target audience: Beginners / SaaS founders / Developers&#10;- Desired angle: Technical deep dive / Practical guide / Comparison-focused&#10;- Constraints: Avoid affiliate tone / Include case study / Add workflow example"
-                      className={`block w-full p-3 bg-black/20 border border-white/5 rounded-lg text-white placeholder:text-zinc-600 focus:ring-1 text-sm resize-y min-h-[100px] custom-scrollbar mb-4 ${mode === 'generate' ? 'focus:ring-indigo-500 focus:border-indigo-500' : 'focus:ring-emerald-500 focus:border-emerald-500'}`}
+                      className={`block w-full p-3 bg-black/30 border border-white/[0.07] rounded-xl text-white placeholder:text-zinc-600 focus:ring-1 text-sm resize-y min-h-[100px] custom-scrollbar mb-4 transition-all ${mode === 'generate' ? 'focus:ring-indigo-500' : 'focus:ring-emerald-500'}`}
                       disabled={isGenerating}
                     />
                   </div>
@@ -1062,7 +1222,7 @@ export default function App() {
                       value={brandVoice}
                       onChange={(e) => setBrandVoice(e.target.value)}
                       placeholder="Example: Write in a friendly, conversational tone like a tech blogger. Use short sentences and simple words. Avoid corporate jargon."
-                      className={`block w-full p-3 bg-black/20 border border-white/5 rounded-lg text-white placeholder:text-zinc-600 focus:ring-1 text-sm resize-y min-h-[80px] custom-scrollbar ${mode === 'generate' ? 'focus:ring-indigo-500 focus:border-indigo-500' : 'focus:ring-emerald-500 focus:border-emerald-500'}`}
+                      className={`block w-full p-3 bg-black/30 border border-white/[0.07] rounded-xl text-white placeholder:text-zinc-600 focus:ring-1 text-sm resize-y min-h-[80px] custom-scrollbar transition-all ${mode === 'generate' ? 'focus:ring-indigo-500' : 'focus:ring-emerald-500'}`}
                       disabled={isGenerating}
                     />
                   </div>
@@ -1175,9 +1335,9 @@ export default function App() {
                  if (phase.id === 0 && !includePhase0) return null;
 
                  return (
-                  <div key={i} className={`p-4 rounded-xl border transition-all duration-300 flex items-center gap-4 ${isActive ? 'bg-indigo-900/20 border-indigo-500/50 scale-105 shadow-lg shadow-indigo-500/10' : isCompleted ? 'bg-zinc-900/50 border-emerald-500/20 opacity-50' : 'bg-zinc-900/20 border-white/5 opacity-30'}`}>
-                    <div className={`w-2 h-2 rounded-full ${isActive ? 'bg-indigo-400 animate-ping' : isCompleted ? 'bg-emerald-500' : 'bg-zinc-700'}`}></div>
-                    <span className={`text-sm font-medium ${isActive ? 'text-white' : 'text-zinc-400'}`}>Phase {phase.id}: {phase.title}</span>
+                  <div key={i} className={`p-4 rounded-xl border transition-all duration-300 flex items-center gap-4 backdrop-blur-md ${isActive ? 'bg-indigo-500/10 border-indigo-500/50 scale-105 shadow-[0_0_30px_rgba(99,102,241,0.2)]' : isCompleted ? 'bg-white/5 border-emerald-500/20 opacity-60' : 'bg-black/20 border-white/5 opacity-40'}`}>
+                    <div className={`w-2.5 h-2.5 rounded-full ${isActive ? 'bg-indigo-400 animate-pulse shadow-[0_0_10px_rgba(129,140,248,0.8)]' : isCompleted ? 'bg-emerald-500' : 'bg-zinc-700'}`}></div>
+                    <span className={`text-sm font-semibold tracking-wide ${isActive ? 'text-white' : 'text-zinc-400'}`}>Phase {phase.id}: {phase.title}</span>
                   </div>
                 );
                })}
@@ -1198,11 +1358,11 @@ export default function App() {
                   key={phaseId}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className={`rounded-2xl border ${phase.border} bg-[#111] overflow-hidden shadow-lg transition-all duration-300`}
+                  className={`rounded-2xl border ${phase.border} bg-white/5 backdrop-blur-xl overflow-hidden shadow-2xl transition-all duration-300`}
                 >
                   <div 
                     onClick={() => togglePhase(phaseId)}
-                    className={`px-6 py-4 border-b ${phase.border} bg-white/5 flex items-center justify-between cursor-pointer hover:bg-white/10 transition-colors`}
+                    className={`px-6 py-4 border-b ${phase.border} bg-black/40 flex items-center justify-between cursor-pointer hover:bg-black/60 transition-colors`}
                   >
                     <div className="flex items-center gap-3">
                       <div className={`p-1.5 rounded-lg bg-white/10 ${phase.color}`}>
@@ -1277,8 +1437,9 @@ export default function App() {
             transition={{ duration: 0.6 }}
             className="mt-8"
           >
-            <div className="bg-[#111] rounded-3xl border border-white/10 overflow-hidden shadow-2xl ring-1 ring-white/5">
-              <div className="border-b border-white/5 bg-[#111]/90 px-6 py-4 flex items-center justify-between sticky top-20 z-20 backdrop-blur-xl">
+            <div className="bg-white/5 backdrop-blur-2xl rounded-3xl border border-white/10 overflow-hidden shadow-2xl ring-1 ring-white/5 relative">
+              <div className="absolute inset-0 bg-gradient-to-b from-indigo-500/5 via-transparent to-transparent pointer-events-none"></div>
+              <div className="border-b border-white/10 bg-black/40 px-6 py-4 flex items-center justify-between sticky top-20 z-20 backdrop-blur-xl">
                 <div className="flex items-center gap-4">
                   <div className="bg-emerald-500/10 text-emerald-400 p-2 rounded-full ring-1 ring-emerald-500/20">
                     <Check className="w-4 h-4" />
@@ -1317,7 +1478,7 @@ export default function App() {
                       }
                     }}
                     disabled={isSaving || saveSuccess}
-                    className={`flex items-center gap-2 text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-lg transition-all group ${saveSuccess ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' : 'text-indigo-400 hover:text-white bg-indigo-500/10 hover:bg-indigo-500/20 border-indigo-500/20 hover:border-indigo-500/40'} border`}
+                    className={`flex items-center gap-2 text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-xl transition-all duration-300 group ${saveSuccess ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20 shadow-[0_0_20px_rgba(16,185,129,0.2)]' : 'text-white bg-indigo-500 hover:bg-indigo-600 border-indigo-400/50 shadow-[0_0_20px_rgba(99,102,241,0.3)] hover:shadow-[0_0_30px_rgba(99,102,241,0.5)] hover:-translate-y-0.5'} border`}
                   >
                     {isSaving ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
@@ -1330,7 +1491,7 @@ export default function App() {
                   </button>
                   <button
                     onClick={handleCopy}
-                    className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/20 px-4 py-2 rounded-lg transition-all group"
+                    className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-zinc-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 px-5 py-2.5 rounded-xl transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(255,255,255,0.05)]"
                   >
                     {copied ? (
                       <>
@@ -1347,44 +1508,50 @@ export default function App() {
                 </div>
               </div>
               
-              <div className="p-8 md:p-16 bg-[#111]">
+              <div className="p-8 md:p-16 relative z-10">
                 {seoScore !== null && (
                   <div className="mb-12 space-y-6">
-                    <div className="p-6 bg-zinc-900/50 border border-white/10 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6">
-                      <div className="flex-1 w-full">
-                        <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
-                          <Target className="w-5 h-5 text-indigo-400" />
+                    <div className="p-8 bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-8 shadow-2xl relative overflow-hidden">
+                      <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 blur-[80px] rounded-full -mr-20 -mt-20 pointer-events-none"></div>
+                      <div className="flex-1 w-full relative z-10">
+                        <h3 className="text-2xl font-bold text-white mb-3 flex items-center gap-3">
+                          <div className="p-2 bg-indigo-500/20 rounded-xl border border-indigo-500/30">
+                            <Target className="w-6 h-6 text-indigo-400" />
+                          </div>
                           Advanced SEO Optimization Score
                         </h3>
-                        <p className="text-zinc-400 text-sm max-w-md mb-4">
+                        <p className="text-zinc-400 text-sm max-w-xl mb-6 leading-relaxed">
                           This score reflects the article's alignment with search intent, semantic entity coverage, and E-E-A-T signals based on live SERP analysis.
                         </p>
                         
                         {seoScore.breakdown && (
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 border-t border-white/10 pt-4">
-                            <div className="bg-black/30 p-3 rounded-lg border border-white/5">
-                              <div className="text-xs text-zinc-500 uppercase tracking-wider mb-1">Structure</div>
-                              <div className="text-lg font-bold text-white">{seoScore.breakdown.structure}/100</div>
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 border-t border-white/10 pt-6">
+                            <div className="bg-black/40 p-4 rounded-2xl border border-white/5 hover:border-white/10 transition-colors">
+                              <div className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">Structure</div>
+                              <div className="text-2xl font-black text-white">{seoScore.breakdown.structure}<span className="text-sm text-zinc-500 font-medium">/100</span></div>
                             </div>
-                            <div className="bg-black/30 p-3 rounded-lg border border-white/5">
-                              <div className="text-xs text-zinc-500 uppercase tracking-wider mb-1">Keywords</div>
-                              <div className="text-lg font-bold text-white">{seoScore.breakdown.keywords}/100</div>
+                            <div className="bg-black/40 p-4 rounded-2xl border border-white/5 hover:border-white/10 transition-colors">
+                              <div className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">Keywords</div>
+                              <div className="text-2xl font-black text-white">{seoScore.breakdown.keywords}<span className="text-sm text-zinc-500 font-medium">/100</span></div>
                             </div>
-                            <div className="bg-black/30 p-3 rounded-lg border border-white/5">
-                              <div className="text-xs text-zinc-500 uppercase tracking-wider mb-1">Readability</div>
-                              <div className="text-lg font-bold text-white">{seoScore.breakdown.readability}/100</div>
+                            <div className="bg-black/40 p-4 rounded-2xl border border-white/5 hover:border-white/10 transition-colors">
+                              <div className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">Readability</div>
+                              <div className="text-2xl font-black text-white">{seoScore.breakdown.readability}<span className="text-sm text-zinc-500 font-medium">/100</span></div>
                             </div>
-                            <div className="bg-black/30 p-3 rounded-lg border border-white/5">
-                              <div className="text-xs text-zinc-500 uppercase tracking-wider mb-1">Intent Match</div>
-                              <div className="text-lg font-bold text-white">{seoScore.breakdown.intent_match}/100</div>
+                            <div className="bg-black/40 p-4 rounded-2xl border border-white/5 hover:border-white/10 transition-colors">
+                              <div className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">Intent Match</div>
+                              <div className="text-2xl font-black text-white">{seoScore.breakdown.intent_match}<span className="text-sm text-zinc-500 font-medium">/100</span></div>
                             </div>
                           </div>
                         )}
                       </div>
-                      <div className="relative w-32 h-32 flex-shrink-0 flex items-center justify-center">
-                        <svg className="w-full h-full transform -rotate-90 absolute inset-0" viewBox="0 0 100 100">
+                      <div className="relative w-40 h-40 flex-shrink-0 flex items-center justify-center relative z-10">
+                        <div className={`absolute inset-0 rounded-full blur-[30px] opacity-20 ${
+                          (seoScore.seo_score || seoScore) >= 80 ? 'bg-emerald-500' : (seoScore.seo_score || seoScore) >= 60 ? 'bg-amber-500' : 'bg-rose-500'
+                        }`}></div>
+                        <svg className="w-full h-full transform -rotate-90 absolute inset-0 drop-shadow-2xl" viewBox="0 0 100 100">
                           <circle
-                            className="text-zinc-800 stroke-current"
+                            className="text-black/50 stroke-current"
                             strokeWidth="8"
                             cx="50"
                             cy="50"
@@ -1393,7 +1560,7 @@ export default function App() {
                           ></circle>
                           <circle
                             className={`${
-                              (seoScore.seo_score || seoScore) >= 80 ? 'text-emerald-500' : (seoScore.seo_score || seoScore) >= 60 ? 'text-amber-500' : 'text-rose-500'
+                              (seoScore.seo_score || seoScore) >= 80 ? 'text-emerald-400' : (seoScore.seo_score || seoScore) >= 60 ? 'text-amber-400' : 'text-rose-400'
                             } stroke-current transition-all duration-1000 ease-out`}
                             strokeWidth="8"
                             strokeLinecap="round"
@@ -1405,16 +1572,16 @@ export default function App() {
                             strokeDashoffset={263.89 - (263.89 * (seoScore.seo_score || seoScore)) / 100}
                           ></circle>
                         </svg>
-                        <div className="relative z-10 flex items-center justify-center flex-col">
+                        <div className="relative z-10 flex items-center justify-center flex-col bg-black/40 w-24 h-24 rounded-full border border-white/10 backdrop-blur-sm">
                           <span className="text-4xl font-black text-white tracking-tighter">{seoScore.seo_score || seoScore}</span>
-                          <span className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold mt-1">Score</span>
+                          <span className="text-[10px] uppercase tracking-widest text-zinc-400 font-bold mt-0.5">Score</span>
                         </div>
                       </div>
                     </div>
 
                     {seoScore.breakdown && (
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div className="md:col-span-1 p-6 bg-zinc-900/50 border border-white/10 rounded-2xl flex flex-col items-center justify-center min-h-[250px]">
+                        <div className="md:col-span-1 p-6 bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl flex flex-col items-center justify-center min-h-[250px] shadow-xl">
                           <h4 className="text-sm font-bold text-zinc-300 mb-4 uppercase tracking-widest w-full text-left">Score Radar</h4>
                           <ResponsiveContainer width="100%" height="100%">
                             <RadarChart cx="50%" cy="50%" outerRadius="70%" data={[
@@ -1433,22 +1600,22 @@ export default function App() {
 
                         <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
                           {seoScore.readability_level && (
-                            <div className="bg-zinc-900/50 p-5 rounded-2xl border border-white/10">
+                            <div className="bg-white/5 backdrop-blur-md p-6 rounded-3xl border border-white/10 shadow-xl hover:bg-white/10 transition-colors">
                               <div className="text-xs text-indigo-400 uppercase tracking-wider mb-2 font-bold flex items-center gap-2">
                                 <FileText className="w-4 h-4" /> Readability Level
                               </div>
-                              <div className="text-xl font-bold text-white">{seoScore.readability_level}</div>
+                              <div className="text-2xl font-black text-white">{seoScore.readability_level}</div>
                             </div>
                           )}
                           
                           {seoScore.nlp_entities && seoScore.nlp_entities.length > 0 && (
-                            <div className="bg-zinc-900/50 p-5 rounded-2xl border border-white/10">
+                            <div className="bg-white/5 backdrop-blur-md p-6 rounded-3xl border border-white/10 shadow-xl hover:bg-white/10 transition-colors">
                               <div className="text-xs text-emerald-400 uppercase tracking-wider mb-2 font-bold flex items-center gap-2">
                                 <Network className="w-4 h-4" /> NLP Entities Detected
                               </div>
                               <div className="flex flex-wrap gap-2 mt-3">
                                 {seoScore.nlp_entities.map((entity: string, idx: number) => (
-                                  <span key={idx} className="px-2 py-1 bg-emerald-500/10 text-emerald-400 text-xs rounded-md border border-emerald-500/20">
+                                  <span key={idx} className="px-2.5 py-1 bg-emerald-500/10 text-emerald-400 text-xs font-medium rounded-lg border border-emerald-500/20">
                                     {entity}
                                   </span>
                                 ))}
@@ -1457,14 +1624,14 @@ export default function App() {
                           )}
 
                           {seoScore.eeat_signals && seoScore.eeat_signals.length > 0 && (
-                            <div className="bg-zinc-900/50 p-5 rounded-2xl border border-white/10">
+                            <div className="bg-white/5 backdrop-blur-md p-6 rounded-3xl border border-white/10 shadow-xl hover:bg-white/10 transition-colors">
                               <div className="text-xs text-blue-400 uppercase tracking-wider mb-2 font-bold flex items-center gap-2">
                                 <ShieldCheck className="w-4 h-4" /> E-E-A-T Signals
                               </div>
-                              <ul className="space-y-1.5 mt-2">
+                              <ul className="space-y-2 mt-3">
                                 {seoScore.eeat_signals.map((signal: string, idx: number) => (
-                                  <li key={idx} className="text-xs text-zinc-300 flex items-start gap-2">
-                                    <Check className="w-3 h-3 text-blue-500 mt-0.5 flex-shrink-0" /> {signal}
+                                  <li key={idx} className="text-sm text-zinc-300 flex items-start gap-2.5">
+                                    <Check className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" /> {signal}
                                   </li>
                                 ))}
                               </ul>
@@ -1472,14 +1639,14 @@ export default function App() {
                           )}
 
                           {seoScore.content_gaps && seoScore.content_gaps.length > 0 && (
-                            <div className="bg-zinc-900/50 p-5 rounded-2xl border border-white/10">
+                            <div className="bg-white/5 backdrop-blur-md p-6 rounded-3xl border border-white/10 shadow-xl hover:bg-white/10 transition-colors">
                               <div className="text-xs text-rose-400 uppercase tracking-wider mb-2 font-bold flex items-center gap-2">
                                 <ScanSearch className="w-4 h-4" /> Content Gaps
                               </div>
-                              <ul className="space-y-1.5 mt-2">
+                              <ul className="space-y-2 mt-3">
                                 {seoScore.content_gaps.map((gap: string, idx: number) => (
-                                  <li key={idx} className="text-xs text-zinc-300 flex items-start gap-2">
-                                    <AlertCircle className="w-3 h-3 text-rose-500 mt-0.5 flex-shrink-0" /> {gap}
+                                  <li key={idx} className="text-sm text-zinc-300 flex items-start gap-2.5">
+                                    <AlertCircle className="w-4 h-4 text-rose-500 mt-0.5 flex-shrink-0" /> {gap}
                                   </li>
                                 ))}
                               </ul>
@@ -1490,13 +1657,13 @@ export default function App() {
                     )}
 
                     {seoScore.improvements && seoScore.improvements.length > 0 && (
-                      <div className="p-6 bg-zinc-900/50 border border-white/10 rounded-2xl">
-                        <div className="text-sm text-amber-400 uppercase tracking-wider mb-4 font-bold flex items-center gap-2">
-                          <AlertCircle className="w-4 h-4" /> Suggested Improvements
+                      <div className="p-8 bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl shadow-xl">
+                        <div className="text-sm text-amber-400 uppercase tracking-wider mb-5 font-bold flex items-center gap-2">
+                          <AlertCircle className="w-5 h-5" /> Suggested Improvements
                         </div>
-                        <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           {seoScore.improvements.map((imp: string, idx: number) => (
-                            <li key={idx} className="text-sm text-zinc-300 flex items-start gap-3 bg-black/20 p-3 rounded-lg border border-white/5">
+                            <li key={idx} className="text-sm text-zinc-300 flex items-start gap-3 bg-black/30 p-4 rounded-xl border border-white/5 hover:border-white/10 transition-colors">
                               <span className="text-amber-500/50 mt-0.5 flex-shrink-0">•</span> {imp}
                             </li>
                           ))}
@@ -1506,17 +1673,17 @@ export default function App() {
                   </div>
                 )}
                 
-                <div className="flex items-center gap-2 mb-6 border-b border-white/10 pb-4">
+                <div className="flex items-center gap-3 mb-8 border-b border-white/10 pb-5">
                   <button 
                     onClick={() => setActiveTab('article')}
-                    className={`px-6 py-3 rounded-xl font-bold transition-all flex items-center gap-2 ${activeTab === 'article' ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/25' : 'bg-zinc-900/50 text-zinc-400 hover:text-white hover:bg-white/10 border border-white/5'}`}
+                    className={`px-6 py-3 rounded-xl font-bold transition-all duration-300 flex items-center gap-2.5 ${activeTab === 'article' ? 'bg-indigo-500 text-white shadow-[0_0_20px_rgba(99,102,241,0.3)]' : 'bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10 border border-white/5 hover:border-white/10 backdrop-blur-sm'}`}
                   >
                     <PenTool className="w-4 h-4" />
                     Final Article
                   </button>
                   <button 
                     onClick={() => setActiveTab('research')}
-                    className={`px-6 py-3 rounded-xl font-bold transition-all flex items-center gap-2 ${activeTab === 'research' ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/25' : 'bg-zinc-900/50 text-zinc-400 hover:text-white hover:bg-white/10 border border-white/5'}`}
+                    className={`px-6 py-3 rounded-xl font-bold transition-all duration-300 flex items-center gap-2.5 ${activeTab === 'research' ? 'bg-indigo-500 text-white shadow-[0_0_20px_rgba(99,102,241,0.3)]' : 'bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10 border border-white/5 hover:border-white/10 backdrop-blur-sm'}`}
                   >
                     <BrainCircuit className="w-4 h-4" />
                     Research & Strategy
@@ -1542,7 +1709,7 @@ export default function App() {
                     />
                   </div>
                 ) : (
-                  <div className="bg-zinc-900 border border-white/10 rounded-xl p-8 prose prose-invert max-w-none custom-scrollbar overflow-y-auto max-h-[800px]">
+                  <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-8 prose prose-invert max-w-none custom-scrollbar overflow-y-auto max-h-[800px] shadow-inner">
                     <ReactMarkdown remarkPlugins={[remarkGfm]}>
                       {researchContent || "No research data available."}
                     </ReactMarkdown>

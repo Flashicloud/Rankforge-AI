@@ -155,42 +155,56 @@ export default function Dashboard({ onViewArticle }: { onViewArticle: (article: 
 
       {articles.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-10">
-          <div className="bg-zinc-900/50 border border-white/5 rounded-2xl p-6 flex flex-col justify-between">
-            <div className="flex items-center gap-3 text-zinc-400 mb-4">
-              <FileText className="w-5 h-5 text-indigo-400" />
-              <span className="font-medium uppercase tracking-wider text-xs">Total Articles</span>
+          <div className="bg-white/5 backdrop-blur-xl border border-white/10 card-glow rounded-2xl p-6 flex flex-col justify-between relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/20 blur-[50px] rounded-full -mr-10 -mt-10 transition-all duration-500 group-hover:bg-indigo-500/30"></div>
+            <div className="flex items-center gap-3 text-zinc-400 mb-4 relative z-10">
+              <div className="p-2 bg-indigo-500/10 rounded-lg">
+                <FileText className="w-5 h-5 text-indigo-400" />
+              </div>
+              <span className="font-semibold uppercase tracking-wider text-xs">Total Articles</span>
             </div>
-            <div className="text-4xl font-black text-white">{articles.length}</div>
+            <div className="text-4xl font-black text-white relative z-10">{articles.length}</div>
           </div>
           
-          <div className="bg-zinc-900/50 border border-white/5 rounded-2xl p-6 flex flex-col justify-between">
-            <div className="flex items-center gap-3 text-zinc-400 mb-4">
-              <Sparkles className="w-5 h-5 text-emerald-400" />
-              <span className="font-medium uppercase tracking-wider text-xs">Avg SEO Score</span>
+          <div className="bg-white/5 backdrop-blur-xl border border-white/10 card-glow rounded-2xl p-6 flex flex-col justify-between relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/20 blur-[50px] rounded-full -mr-10 -mt-10 transition-all duration-500 group-hover:bg-emerald-500/30"></div>
+            <div className="flex items-center gap-3 text-zinc-400 mb-4 relative z-10">
+              <div className="p-2 bg-emerald-500/10 rounded-lg">
+                <Sparkles className="w-5 h-5 text-emerald-400" />
+              </div>
+              <span className="font-semibold uppercase tracking-wider text-xs">Avg SEO Score</span>
             </div>
-            <div className="flex items-end gap-2">
+            <div className="flex items-end gap-2 relative z-10">
               <div className={`text-4xl font-black ${averageScore >= 80 ? 'text-emerald-400' : averageScore >= 60 ? 'text-amber-400' : 'text-rose-400'}`}>
                 {averageScore}
               </div>
-              <div className="text-zinc-500 text-sm mb-1">/ 100</div>
+              <div className="text-zinc-500 text-sm mb-1 font-medium">/ 100</div>
             </div>
           </div>
 
-          <div className="md:col-span-2 bg-zinc-900/50 border border-white/5 rounded-2xl p-6 flex flex-col justify-between relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 blur-3xl rounded-full -mr-10 -mt-10"></div>
+          <div className="md:col-span-2 bg-white/5 backdrop-blur-xl border border-white/10 card-glow rounded-2xl p-6 flex flex-col justify-between relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-48 h-48 bg-blue-500/20 blur-[60px] rounded-full -mr-10 -mt-10 transition-all duration-500 group-hover:bg-blue-500/30"></div>
             <div className="flex items-center gap-3 text-zinc-400 mb-4 relative z-10">
-              <FileEdit className="w-5 h-5 text-blue-400" />
-              <span className="font-medium uppercase tracking-wider text-xs">Content Distribution</span>
-            </div>
-            <div className="flex items-center gap-8 relative z-10">
-              <div>
-                <div className="text-2xl font-bold text-white mb-1">{generatedCount}</div>
-                <div className="text-xs text-zinc-500 uppercase tracking-wider">Generated</div>
+              <div className="p-2 bg-blue-500/10 rounded-lg">
+                <FileEdit className="w-5 h-5 text-blue-400" />
               </div>
-              <div className="w-px h-10 bg-white/10"></div>
+              <span className="font-semibold uppercase tracking-wider text-xs">Content Distribution</span>
+            </div>
+            <div className="flex items-center gap-10 relative z-10">
               <div>
-                <div className="text-2xl font-bold text-white mb-1">{optimizedCount}</div>
-                <div className="text-xs text-zinc-500 uppercase tracking-wider">Optimized</div>
+                <div className="text-3xl font-black text-white mb-1">{generatedCount}</div>
+                <div className="text-xs font-medium text-zinc-500 uppercase tracking-wider flex items-center gap-1.5">
+                  <div className="w-2 h-2 rounded-full bg-indigo-400"></div>
+                  Generated
+                </div>
+              </div>
+              <div className="w-px h-12 bg-white/10"></div>
+              <div>
+                <div className="text-3xl font-black text-white mb-1">{optimizedCount}</div>
+                <div className="text-xs font-medium text-zinc-500 uppercase tracking-wider flex items-center gap-1.5">
+                  <div className="w-2 h-2 rounded-full bg-emerald-400"></div>
+                  Optimized
+                </div>
               </div>
             </div>
           </div>
@@ -202,12 +216,13 @@ export default function Dashboard({ onViewArticle }: { onViewArticle: (article: 
       </div>
 
       {articles.length === 0 ? (
-        <div className="bg-zinc-900/30 border border-white/5 rounded-2xl p-12 text-center">
-          <div className="w-16 h-16 bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-4">
-            <FileText className="w-8 h-8 text-zinc-500" />
+        <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-16 text-center shadow-2xl relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-indigo-500/5 via-transparent to-transparent pointer-events-none"></div>
+          <div className="w-20 h-20 bg-black/40 border border-white/10 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-inner relative z-10">
+            <FileText className="w-10 h-10 text-zinc-500" />
           </div>
-          <h3 className="text-xl font-bold text-white mb-2">No articles yet</h3>
-          <p className="text-zinc-400 max-w-md mx-auto">
+          <h3 className="text-2xl font-bold text-white mb-3 relative z-10">No articles yet</h3>
+          <p className="text-zinc-400 max-w-md mx-auto relative z-10 leading-relaxed">
             You haven't saved any articles to your dashboard yet. Generate or optimize an article and click "Save to Dashboard" to see it here.
           </p>
         </div>
@@ -220,19 +235,20 @@ export default function Dashboard({ onViewArticle }: { onViewArticle: (article: 
               transition={{ delay: index * 0.05 }}
               key={article.id}
               onClick={() => onViewArticle(article)}
-              className="bg-zinc-900/40 border border-white/5 hover:border-indigo-500/30 rounded-2xl p-6 cursor-pointer transition-all group hover:bg-zinc-900/60"
+              className="bg-white/5 backdrop-blur-md border border-white/10 hover:border-indigo-500/50 rounded-2xl p-6 cursor-pointer transition-all duration-300 group hover:bg-white/10 hover:shadow-[0_0_30px_rgba(99,102,241,0.15)] relative overflow-hidden"
             >
-              <div className="flex justify-between items-start mb-4">
-                <div className={`p-2 rounded-lg ${article.mode === 'generate' ? 'bg-indigo-500/10 text-indigo-400' : 'bg-emerald-500/10 text-emerald-400'}`}>
+              <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 blur-[50px] rounded-full -mr-10 -mt-10 transition-all duration-500 group-hover:bg-indigo-500/20"></div>
+              <div className="flex justify-between items-start mb-4 relative z-10">
+                <div className={`p-2.5 rounded-xl border ${article.mode === 'generate' ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'}`}>
                   {article.mode === 'generate' ? <Sparkles className="w-5 h-5" /> : <FileEdit className="w-5 h-5" />}
                 </div>
-                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity relative">
+                <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity relative">
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       setExportMenuOpen(exportMenuOpen === article.id ? null : article.id);
                     }}
-                    className="text-zinc-500 hover:text-indigo-400 transition-colors p-2 hover:bg-indigo-400/10 rounded-lg"
+                    className="text-zinc-400 hover:text-indigo-400 transition-all p-2 hover:bg-indigo-500/20 rounded-lg bg-black/20 backdrop-blur-sm border border-white/5 hover:border-indigo-500/30"
                     title="Export Article"
                   >
                     <Download className="w-4 h-4" />
@@ -246,16 +262,16 @@ export default function Dashboard({ onViewArticle }: { onViewArticle: (article: 
                           initial={{ opacity: 0, scale: 0.95, y: -10 }}
                           animate={{ opacity: 1, scale: 1, y: 0 }}
                           exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                          className="absolute right-0 top-10 z-50 w-48 bg-zinc-900 border border-white/10 rounded-xl shadow-2xl overflow-hidden backdrop-blur-xl"
+                          className="absolute right-0 top-10 z-50 w-48 bg-zinc-900/90 border border-white/10 rounded-xl shadow-2xl overflow-hidden backdrop-blur-xl"
                         >
-                          <div className="p-1">
-                            <button onClick={(e) => handleExport(article, 'pdf', e)} className="w-full text-left px-3 py-2 text-sm text-zinc-300 hover:text-white hover:bg-white/5 rounded-lg flex items-center gap-2">
+                          <div className="p-1.5">
+                            <button onClick={(e) => handleExport(article, 'pdf', e)} className="w-full text-left px-3 py-2.5 text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/10 rounded-lg flex items-center gap-2.5 transition-colors">
                               <FileText className="w-4 h-4 text-red-400" /> Export as PDF
                             </button>
-                            <button onClick={(e) => handleExport(article, 'word', e)} className="w-full text-left px-3 py-2 text-sm text-zinc-300 hover:text-white hover:bg-white/5 rounded-lg flex items-center gap-2">
+                            <button onClick={(e) => handleExport(article, 'word', e)} className="w-full text-left px-3 py-2.5 text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/10 rounded-lg flex items-center gap-2.5 transition-colors">
                               <FileDown className="w-4 h-4 text-blue-400" /> Export as Word
                             </button>
-                            <button onClick={(e) => handleExport(article, 'wp', e)} className="w-full text-left px-3 py-2 text-sm text-zinc-300 hover:text-white hover:bg-white/5 rounded-lg flex items-center gap-2">
+                            <button onClick={(e) => handleExport(article, 'wp', e)} className="w-full text-left px-3 py-2.5 text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/10 rounded-lg flex items-center gap-2.5 transition-colors">
                               <FileCode2 className="w-4 h-4 text-indigo-400" /> Send to WordPress
                             </button>
                           </div>
@@ -269,7 +285,7 @@ export default function Dashboard({ onViewArticle }: { onViewArticle: (article: 
                       e.stopPropagation();
                       setArticleToDelete(article.id);
                     }}
-                    className="text-zinc-500 hover:text-red-400 transition-colors p-2 hover:bg-red-400/10 rounded-lg"
+                    className="text-zinc-400 hover:text-red-400 transition-all p-2 hover:bg-red-500/20 rounded-lg bg-black/20 backdrop-blur-sm border border-white/5 hover:border-red-500/30"
                     title="Delete Article"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -277,22 +293,22 @@ export default function Dashboard({ onViewArticle }: { onViewArticle: (article: 
                 </div>
               </div>
               
-              <h3 className="text-lg font-bold text-white mb-2 line-clamp-2" title={article.keyword}>
+              <h3 className="text-lg font-bold text-white mb-2 line-clamp-2 relative z-10" title={article.keyword}>
                 {article.keyword}
               </h3>
               
-              <div className="flex items-center gap-4 text-sm text-zinc-400 mt-4 pt-4 border-t border-white/5">
-                <div className="flex items-center gap-1.5">
-                  <Clock className="w-4 h-4" />
-                  {new Date(article.createdAt).toLocaleDateString()}
+              <div className="flex items-center gap-3 text-sm text-zinc-400 mt-5 pt-5 border-t border-white/10 relative z-10">
+                <div className="flex items-center gap-1.5 bg-black/30 px-3 py-1.5 rounded-full border border-white/5">
+                  <Clock className="w-3.5 h-3.5" />
+                  <span className="text-xs font-medium">{new Date(article.createdAt).toLocaleDateString()}</span>
                 </div>
                 {article.seoScore != null && (
-                  <div className="flex items-center gap-1.5 ml-auto">
+                  <div className="flex items-center gap-2 ml-auto bg-black/30 px-3 py-1.5 rounded-full border border-white/5">
                     <div className={`w-2 h-2 rounded-full ${
-                      (typeof article.seoScore === 'object' && article.seoScore !== null ? (article.seoScore as any).seo_score : article.seoScore) >= 80 ? 'bg-emerald-500' : 
-                      (typeof article.seoScore === 'object' && article.seoScore !== null ? (article.seoScore as any).seo_score : article.seoScore) >= 60 ? 'bg-amber-500' : 'bg-red-500'
+                      (typeof article.seoScore === 'object' && article.seoScore !== null ? (article.seoScore as any).seo_score : article.seoScore) >= 80 ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]' : 
+                      (typeof article.seoScore === 'object' && article.seoScore !== null ? (article.seoScore as any).seo_score : article.seoScore) >= 60 ? 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.8)]' : 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]'
                     }`}></div>
-                    Score: {typeof article.seoScore === 'object' && article.seoScore !== null ? (article.seoScore as any).seo_score : article.seoScore}
+                    <span className="text-xs font-bold text-white">Score: {typeof article.seoScore === 'object' && article.seoScore !== null ? (article.seoScore as any).seo_score : article.seoScore}</span>
                   </div>
                 )}
               </div>

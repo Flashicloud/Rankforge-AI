@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -7,123 +8,283 @@
 
 @layer base {
   body {
-    @apply font-sans bg-[#0a0a0a] text-white;
+    @apply font-sans bg-[#080810] text-white antialiased;
   }
 }
 
-/* Custom styles for ReactQuill */
+/* =========================================================
+   BACKGROUND GRID
+   ========================================================= */
+.bg-grid {
+  background-image:
+    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+.bg-dot {
+  background-image: radial-gradient(rgba(255,255,255,0.07) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* =========================================================
+   GRADIENT TEXT
+   ========================================================= */
+.gradient-text {
+  background: linear-gradient(135deg, #818cf8 0%, #a78bfa 40%, #f472b6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* =========================================================
+   SHIMMER ANIMATION
+   ========================================================= */
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.shimmer-btn {
+  background: linear-gradient(90deg, #fff 30%, #e0e7ff 50%, #fff 70%);
+  background-size: 200% auto;
+  animation: shimmer 3s linear infinite;
+  color: #000;
+}
+
+/* =========================================================
+   GLOW PULSE
+   ========================================================= */
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(99,102,241,0.3), 0 0 40px rgba(99,102,241,0.1); }
+  50% { box-shadow: 0 0 40px rgba(99,102,241,0.5), 0 0 80px rgba(99,102,241,0.2); }
+}
+
+.glow-indigo {
+  animation: glow-pulse 3s ease-in-out infinite;
+}
+
+/* =========================================================
+   FLOAT ANIMATION
+   ========================================================= */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+.float-anim {
+  animation: float 5s ease-in-out infinite;
+}
+
+/* =========================================================
+   MARQUEE / TICKER
+   ========================================================= */
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+.marquee-track {
+  animation: marquee 28s linear infinite;
+  display: flex;
+  width: max-content;
+}
+
+.marquee-wrapper {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+}
+
+/* =========================================================
+   CARD HOVER GLOW
+   ========================================================= */
+.card-glow {
+  transition: all 0.3s ease;
+}
+.card-glow:hover {
+  box-shadow: 0 0 0 1px rgba(99,102,241,0.3), 0 8px 32px rgba(99,102,241,0.15);
+  transform: translateY(-2px);
+}
+
+/* =========================================================
+   GRADIENT BORDER
+   ========================================================= */
+.gradient-border {
+  position: relative;
+  background: #111118;
+  border-radius: 1.5rem;
+}
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 1.5rem;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(99,102,241,0.4), rgba(167,139,250,0.2), rgba(244,114,182,0.1));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* =========================================================
+   NUMBER COUNT UP
+   ========================================================= */
+.stat-number {
+  font-variant-numeric: tabular-nums;
+}
+
+/* =========================================================
+   REVERSE SPIN
+   ========================================================= */
+@keyframes reverse-spin {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+.reverse-spin {
+  animation: reverse-spin 1.5s linear infinite;
+}
+
+/* =========================================================
+   REACT QUILL
+   ========================================================= */
 .quill {
   display: flex;
   flex-direction: column;
 }
 .ql-toolbar.ql-snow {
   border: none !important;
-  border-bottom: 1px solid #e5e7eb !important;
-  background-color: #f9fafb;
+  border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+  background-color: #18181f;
   padding: 12px !important;
 }
 .ql-container.ql-snow {
   border: none !important;
   font-family: 'Inter', sans-serif !important;
   font-size: 1.05rem !important;
-  line-height: 1.7 !important;
+  line-height: 1.75 !important;
+  background: #111118;
 }
 .ql-editor {
   min-height: 500px;
   padding: 2rem !important;
+  color: #e4e4e7 !important;
 }
 .ql-editor h1, .ql-editor h2, .ql-editor h3 {
   font-weight: 700 !important;
   margin-top: 1.5em;
   margin-bottom: 0.5em;
+  color: #fff;
 }
 .ql-editor h1 { font-size: 2em; }
 .ql-editor h2 { font-size: 1.5em; }
 .ql-editor h3 { font-size: 1.17em; }
 .ql-editor p { margin-bottom: 1em; }
+.ql-snow .ql-stroke { stroke: #71717a !important; }
+.ql-snow .ql-fill { fill: #71717a !important; }
+.ql-snow .ql-picker { color: #71717a !important; }
+.ql-snow .ql-picker-options { background: #18181f !important; border-color: rgba(255,255,255,0.1) !important; }
 
+/* =========================================================
+   CUSTOM SCROLLBAR
+   ========================================================= */
 .custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
+  width: 4px;
+  height: 4px;
 }
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255,255,255,0.03);
+  border-radius: 10px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255,255,255,0.12);
   border-radius: 10px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255,255,255,0.2);
 }
 
+/* =========================================================
+   MARKDOWN BODY
+   ========================================================= */
 .markdown-body.dark-mode {
   @apply text-zinc-300 leading-relaxed;
 }
-
 .markdown-body.dark-mode h1 {
   @apply text-3xl font-bold mt-10 mb-6 text-white tracking-tight border-b border-white/10 pb-4;
 }
-
 .markdown-body.dark-mode h2 {
-  @apply text-2xl font-bold mt-10 mb-4 text-indigo-200 tracking-tight flex items-center gap-2;
+  @apply text-2xl font-bold mt-10 mb-4 text-indigo-200 tracking-tight;
 }
-
 .markdown-body.dark-mode h3 {
   @apply text-xl font-semibold mt-8 mb-3 text-white;
 }
-
 .markdown-body.dark-mode p {
   @apply mb-5 text-zinc-300 leading-7;
 }
-
 .markdown-body.dark-mode ul {
   @apply list-disc list-outside ml-6 mb-6 text-zinc-300 marker:text-indigo-500;
 }
-
 .markdown-body.dark-mode ol {
   @apply list-decimal list-outside ml-6 mb-6 text-zinc-300 marker:text-indigo-500;
 }
-
 .markdown-body.dark-mode li {
   @apply mb-2 pl-1;
 }
-
 .markdown-body.dark-mode strong {
   @apply font-bold text-white;
 }
-
 .markdown-body.dark-mode blockquote {
   @apply border-l-4 border-indigo-500 pl-6 py-2 my-6 bg-indigo-500/10 italic text-zinc-200 rounded-r-lg;
 }
-
 .markdown-body.dark-mode code {
   @apply font-mono text-sm bg-white/10 px-1.5 py-0.5 rounded text-pink-300 border border-white/5;
 }
-
 .markdown-body.dark-mode pre {
-  @apply bg-[#050505] text-zinc-300 p-6 rounded-xl overflow-x-auto mb-6 border border-white/10 shadow-inner;
+  @apply bg-[#050508] text-zinc-300 p-6 rounded-xl overflow-x-auto mb-6 border border-white/10 shadow-inner;
 }
-
 .markdown-body.dark-mode pre code {
   @apply bg-transparent text-inherit p-0 border-0;
 }
-
 .markdown-body.dark-mode table {
   @apply w-full border-collapse mb-8 text-sm overflow-hidden rounded-lg ring-1 ring-white/10;
 }
-
 .markdown-body.dark-mode th {
   @apply border-b border-white/10 bg-white/5 px-6 py-3 text-left font-bold text-white uppercase tracking-wider text-xs;
 }
-
 .markdown-body.dark-mode td {
   @apply border-b border-white/5 px-6 py-4 text-zinc-300 bg-white/[0.02];
 }
-
 .markdown-body.dark-mode a {
   @apply text-indigo-400 hover:text-indigo-300 underline decoration-indigo-500/30 underline-offset-4 transition-colors;
 }
-
 .markdown-body.dark-mode hr {
   @apply my-10 border-white/10;
+}
+
+/* =========================================================
+   INPUT FOCUS GLOW
+   ========================================================= */
+input:focus, textarea:focus {
+  outline: none;
+}
+
+/* =========================================================
+   BADGE PULSE
+   ========================================================= */
+@keyframes badge-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(99,102,241,0.4); }
+  50% { box-shadow: 0 0 0 6px rgba(99,102,241,0); }
+}
+.badge-pulse::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #818cf8;
+  animation: badge-glow 2s ease-in-out infinite;
+  margin-right: 8px;
+  vertical-align: middle;
 }
