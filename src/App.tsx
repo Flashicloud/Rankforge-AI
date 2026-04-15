@@ -80,6 +80,27 @@ const CustomSelect = ({ value, onChange, options, placeholder, disabled }: { val
 
 function LandingPage({ onStart, onShowAuth, user }: { onStart: () => void, onShowAuth: () => void, user: User | null }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [activeLegalPage, setActiveLegalPage] = useState<'privacy' | 'terms' | 'cookie' | 'contact' | null>(null);
+
+  const legalContent = {
+    privacy: {
+      title: 'Privacy Policy',
+      content: `Last updated: ${new Date().toLocaleDateString()}\n\nAt RankForge AI, we take your privacy seriously. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website and use our services.\n\n**1. Information We Collect**\nWe may collect personal information such as your name, email address, and usage data when you register for an account or use our AI services.\n\n**2. How We Use Your Information**\nWe use the information we collect to provide, maintain, and improve our services, to communicate with you, and to personalize your experience.\n\n**3. Data Security**\nWe implement reasonable security measures to protect your personal information from unauthorized access, alteration, disclosure, or destruction.\n\n**4. Third-Party Services**\nWe may use third-party service providers to facilitate our services, such as payment processors and analytics providers. These third parties have access to your personal information only to perform these tasks on our behalf.\n\n**5. Changes to This Policy**\nWe may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page.`
+    },
+    terms: {
+      title: 'Terms of Service',
+      content: `Last updated: ${new Date().toLocaleDateString()}\n\nWelcome to RankForge AI. By accessing or using our website and services, you agree to be bound by these Terms of Service.\n\n**1. Use of Services**\nYou must use our services in compliance with all applicable laws and regulations. You may not use our services for any illegal or unauthorized purpose.\n\n**2. User Accounts**\nYou are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account.\n\n**3. Intellectual Property**\nAll content, features, and functionality of our services are owned by RankForge AI and are protected by intellectual property laws.\n\n**4. Limitation of Liability**\nRankForge AI shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use of or inability to use our services.\n\n**5. Termination**\nWe may terminate or suspend your account and access to our services immediately, without prior notice or liability, for any reason whatsoever, including without limitation if you breach the Terms.`
+    },
+    cookie: {
+      title: 'Cookie Policy',
+      content: `Last updated: ${new Date().toLocaleDateString()}\n\nThis Cookie Policy explains how RankForge AI uses cookies and similar technologies to recognize you when you visit our website.\n\n**1. What are cookies?**\nCookies are small data files that are placed on your computer or mobile device when you visit a website. They are widely used to make websites work more efficiently and to provide reporting information.\n\n**2. How we use cookies**\nWe use cookies to understand how you use our website, to remember your preferences, and to improve your user experience. We may also use cookies for authentication and security purposes.\n\n**3. Types of cookies we use**\nWe use both session cookies (which expire when you close your browser) and persistent cookies (which stay on your device until deleted). We may use essential cookies, performance cookies, and functionality cookies.\n\n**4. Your choices**\nYou have the right to decide whether to accept or reject cookies. You can set or amend your web browser controls to accept or refuse cookies.`
+    },
+    contact: {
+      title: 'Contact Us',
+      content: `We'd love to hear from you! If you have any questions, concerns, or feedback, please reach out to us.\n\n**Email:** support@rankforgeai.com\n\n**Address:**\nRankForge AI HQ\n123 Innovation Drive\nTech City, TC 90210\n\nFor partnership inquiries, please email partners@rankforgeai.com.\n\nFor press inquiries, please email press@rankforgeai.com.`
+    }
+  };
+
   const marqueeItems = [
     { icon: Globe, label: 'Live SERP Analysis' },
     { icon: BrainCircuit, label: 'Semantic Entity Mapping' },
@@ -702,10 +723,10 @@ function LandingPage({ onStart, onShowAuth, user }: { onStart: () => void, onSho
             <div>
               <h4 className="text-white font-bold mb-4 text-sm uppercase tracking-wider">Legal</h4>
               <ul className="space-y-3">
-                <li><a href="#" className="text-zinc-500 hover:text-indigo-400 text-sm transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="text-zinc-500 hover:text-indigo-400 text-sm transition-colors">Terms of Service</a></li>
-                <li><a href="#" className="text-zinc-500 hover:text-indigo-400 text-sm transition-colors">Cookie Policy</a></li>
-                <li><a href="#" className="text-zinc-500 hover:text-indigo-400 text-sm transition-colors">Contact Us</a></li>
+                <li><button onClick={() => setActiveLegalPage('privacy')} className="text-zinc-500 hover:text-indigo-400 text-sm transition-colors">Privacy Policy</button></li>
+                <li><button onClick={() => setActiveLegalPage('terms')} className="text-zinc-500 hover:text-indigo-400 text-sm transition-colors">Terms of Service</button></li>
+                <li><button onClick={() => setActiveLegalPage('cookie')} className="text-zinc-500 hover:text-indigo-400 text-sm transition-colors">Cookie Policy</button></li>
+                <li><button onClick={() => setActiveLegalPage('contact')} className="text-zinc-500 hover:text-indigo-400 text-sm transition-colors">Contact Us</button></li>
               </ul>
             </div>
           </div>
@@ -723,6 +744,50 @@ function LandingPage({ onStart, onShowAuth, user }: { onStart: () => void, onSho
           </div>
         </div>
       </footer>
+
+      {/* Legal Modal */}
+      <AnimatePresence>
+        {activeLegalPage && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+              onClick={() => setActiveLegalPage(null)}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-full max-w-2xl bg-[#0e0e1a] border border-white/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]"
+            >
+              <div className="p-6 border-b border-white/10 flex justify-between items-center bg-white/5">
+                <h2 className="text-2xl font-bold text-white">{legalContent[activeLegalPage].title}</h2>
+                <button
+                  onClick={() => setActiveLegalPage(null)}
+                  className="p-2 text-zinc-400 hover:text-white hover:bg-white/10 rounded-xl transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="p-6 overflow-y-auto custom-scrollbar">
+                <div className="prose prose-invert prose-indigo max-w-none">
+                  <ReactMarkdown>{legalContent[activeLegalPage].content}</ReactMarkdown>
+                </div>
+              </div>
+              <div className="p-6 border-t border-white/10 bg-white/5 flex justify-end">
+                <button
+                  onClick={() => setActiveLegalPage(null)}
+                  className="px-6 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl font-medium transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
