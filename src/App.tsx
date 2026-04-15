@@ -9,8 +9,6 @@ import remarkGfm from 'remark-gfm';
 import { generateSEOContent, optimizeSEOContent } from './services/gemini';
 import { Search, Sparkles, FileText, AlertCircle, Copy, Check, Loader2, Layers, BarChart3, Target, Network, ShieldCheck, PenTool, ScanSearch, Zap, ChevronDown, ChevronUp, TrendingUp, BrainCircuit, Fingerprint, ArrowRight, Terminal, FileEdit, Brain, Globe, LogIn, LogOut, LayoutDashboard, Save, X, Menu, Lock } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import ReactQuill from 'react-quill-new';
-import 'react-quill-new/dist/quill.snow.css';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 import TurndownService from 'turndown';
@@ -1773,20 +1771,11 @@ export default function App() {
 
                 {activeTab === 'article' ? (
                   <div className="bg-white text-black rounded-xl overflow-hidden shadow-sm border border-white/10">
-                    <ReactQuill 
-                      theme="snow" 
-                      value={editableContent} 
-                      onChange={setEditableContent}
-                      modules={{
-                        toolbar: [
-                          [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-                          ['bold', 'italic', 'underline', 'strike'],
-                          [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                          ['link', 'image', 'blockquote', 'code-block'],
-                          ['clean']
-                        ]
-                      }}
-                      className="min-h-[500px]"
+                    <textarea
+                      value={editableContent}
+                      onChange={(e) => setEditableContent(e.target.value)}
+                      className="w-full min-h-[500px] p-6 bg-white text-black focus:outline-none resize-y font-sans text-lg leading-relaxed"
+                      placeholder="Edit your article here... (Markdown supported)"
                     />
                   </div>
                 ) : (
