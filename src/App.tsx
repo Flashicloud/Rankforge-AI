@@ -3,22 +3,30 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { generateSEOContent, optimizeSEOContent } from './services/gemini';
 import { Search, Sparkles, FileText, AlertCircle, Copy, Check, Loader2, Layers, BarChart3, Target, Network, ShieldCheck, PenTool, ScanSearch, Zap, ChevronDown, ChevronUp, TrendingUp, BrainCircuit, Fingerprint, ArrowRight, Terminal, FileEdit, Brain, Globe, LogIn, LogOut, LayoutDashboard, Save, X, Menu, Lock } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import JoditEditor from 'jodit-react';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 import TurndownService from 'turndown';
 import { auth, db, logOut } from './services/firebase';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { collection, addDoc } from 'firebase/firestore';
-import Dashboard from './components/Dashboard';
-import AuthModal from './components/AuthModal';
-import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
+
+const Dashboard = lazy(() => import('./components/Dashboard'));
+const AuthModal = lazy(() => import('./components/AuthModal'));
+const JoditEditor = lazy(() => import('jodit-react'));
+
+// Lazy load recharts components
+const RadarChart = lazy(() => import('recharts').then(module => ({ default: module.RadarChart })));
+const PolarGrid = lazy(() => import('recharts').then(module => ({ default: module.PolarGrid })));
+const PolarAngleAxis = lazy(() => import('recharts').then(module => ({ default: module.PolarAngleAxis })));
+const PolarRadiusAxis = lazy(() => import('recharts').then(module => ({ default: module.PolarRadiusAxis })));
+const Radar = lazy(() => import('recharts').then(module => ({ default: module.Radar })));
+const ResponsiveContainer = lazy(() => import('recharts').then(module => ({ default: module.ResponsiveContainer })));
 
 interface Option {
   value: string;
@@ -973,7 +981,11 @@ export default function App() {
     return (
       <>
         <LandingPage onStart={() => user ? setView('app') : setShowAuthModal(true)} onShowAuth={() => setShowAuthModal(true)} user={user} />
-        {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
+        {showAuthModal && (
+          <Suspense fallback={<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80"><Loader2 className="w-8 h-8 text-indigo-500 animate-spin" /></div>}>
+            <AuthModal onClose={() => setShowAuthModal(false)} />
+          </Suspense>
+        )}
       </>
     );
   }
@@ -1216,22 +1228,28 @@ export default function App() {
         </div>
       </header>
 
-      {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
+      {showAuthModal && (
+        <Suspense fallback={<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80"><Loader2 className="w-8 h-8 text-indigo-500 animate-spin" /></div>}>
+          <AuthModal onClose={() => setShowAuthModal(false)} />
+        </Suspense>
+      )}
 
       <main className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 z-10">
         
         {view === 'dashboard' ? (
-          <Dashboard onViewArticle={async (article) => {
-            setKeyword(article.keyword);
-            setMode(article.mode);
-            setContent(article.content);
-            setSeoScore(article.seoScore || null);
-            setPhaseOutputs({});
-            const html = await marked.parse(article.content);
-            const cleanHtml = DOMPurify.sanitize(html);
-            setEditableContent(cleanHtml);
-            setView('app');
-          }} />
+          <Suspense fallback={<div className="flex items-center justify-center min-h-[50vh]"><Loader2 className="w-8 h-8 text-indigo-500 animate-spin" /></div>}>
+            <Dashboard onViewArticle={async (article) => {
+              setKeyword(article.keyword);
+              setMode(article.mode);
+              setContent(article.content);
+              setSeoScore(article.seoScore || null);
+              setPhaseOutputs({});
+              const html = await marked.parse(article.content);
+              const cleanHtml = DOMPurify.sanitize(html);
+              setEditableContent(cleanHtml);
+              setView('app');
+            }} />
+          </Suspense>
         ) : (
           <>
         {/* Mode Switcher */}
@@ -1721,19 +1739,21 @@ export default function App() {
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div className="md:col-span-1 p-6 bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl flex flex-col items-center justify-center min-h-[250px] shadow-xl">
                           <h4 className="text-sm font-bold text-zinc-300 mb-4 uppercase tracking-widest w-full text-left">Score Radar</h4>
-                          <ResponsiveContainer width="100%" height="100%">
-                            <RadarChart cx="50%" cy="50%" outerRadius="70%" data={[
-                              { subject: 'Structure', A: seoScore.breakdown.structure, fullMark: 100 },
-                              { subject: 'Keywords', A: seoScore.breakdown.keywords, fullMark: 100 },
-                              { subject: 'Readability', A: seoScore.breakdown.readability, fullMark: 100 },
-                              { subject: 'Intent', A: seoScore.breakdown.intent_match, fullMark: 100 },
-                            ]}>
-                              <PolarGrid stroke="#333" />
-                              <PolarAngleAxis dataKey="subject" tick={{ fill: '#888', fontSize: 10 }} />
-                              <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
-                              <Radar name="Score" dataKey="A" stroke="#818cf8" fill="#818cf8" fillOpacity={0.5} />
-                            </RadarChart>
-                          </ResponsiveContainer>
+                          <Suspense fallback={<div className="w-full h-full flex items-center justify-center"><Loader2 className="w-6 h-6 text-indigo-500 animate-spin" /></div>}>
+                            <ResponsiveContainer width="100%" height="100%">
+                              <RadarChart cx="50%" cy="50%" outerRadius="70%" data={[
+                                { subject: 'Structure', A: seoScore.breakdown.structure, fullMark: 100 },
+                                { subject: 'Keywords', A: seoScore.breakdown.keywords, fullMark: 100 },
+                                { subject: 'Readability', A: seoScore.breakdown.readability, fullMark: 100 },
+                                { subject: 'Intent', A: seoScore.breakdown.intent_match, fullMark: 100 },
+                              ]}>
+                                <PolarGrid stroke="#333" />
+                                <PolarAngleAxis dataKey="subject" tick={{ fill: '#888', fontSize: 10 }} />
+                                <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
+                                <Radar name="Score" dataKey="A" stroke="#818cf8" fill="#818cf8" fillOpacity={0.5} />
+                              </RadarChart>
+                            </ResponsiveContainer>
+                          </Suspense>
                         </div>
 
                         <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1837,21 +1857,23 @@ export default function App() {
 
                 {activeTab === 'article' ? (
                   <div className="bg-white text-black rounded-xl overflow-hidden shadow-sm border border-white/10">
-                    <JoditEditor
-                      value={editableContent}
-                      config={{
-                        readonly: false,
-                        height: 500,
-                        placeholder: 'Edit your article here...',
-                        theme: 'default',
-                        style: {
-                          fontFamily: 'inherit',
-                          fontSize: '16px'
-                        }
-                      }}
-                      onBlur={(newContent) => setEditableContent(newContent)}
-                      onChange={(newContent) => {}}
-                    />
+                    <Suspense fallback={<div className="min-h-[500px] flex items-center justify-center bg-zinc-50"><Loader2 className="w-8 h-8 text-indigo-500 animate-spin" /></div>}>
+                      <JoditEditor
+                        value={editableContent}
+                        config={{
+                          readonly: false,
+                          height: 500,
+                          placeholder: 'Edit your article here...',
+                          theme: 'default',
+                          style: {
+                            fontFamily: 'inherit',
+                            fontSize: '16px'
+                          }
+                        }}
+                        onBlur={(newContent) => setEditableContent(newContent)}
+                        onChange={(newContent) => {}}
+                      />
+                    </Suspense>
                   </div>
                 ) : (
                   <div className="w-full">
