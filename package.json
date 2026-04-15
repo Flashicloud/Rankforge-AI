@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "tsx server.ts",
     "start": "node server.js",
-    "build": "vite build && esbuild server.ts --bundle --platform=node --target=node18 --packages=external --outfile=server.js",
+    "build": "vite build && esbuild server.ts --bundle --platform=node --target=node18 --packages=external --format=esm --outfile=server.js",
     "preview": "vite preview",
     "clean": "rm -rf dist",
     "lint": "tsc --noEmit"
@@ -27,6 +27,8 @@
     "file-saver": "^2.0.5",
     "firebase": "^12.10.0",
     "html2pdf.js": "^0.14.0",
+    "jodit": "^4.12.2",
+    "jodit-react": "^5.3.21",
     "lucide-react": "^0.546.0",
     "marked": "^17.0.4",
     "motion": "^12.23.24",
