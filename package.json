@@ -31,7 +31,6 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-markdown": "^10.1.0",
-    "react-quill": "^2.0.0",
     "react-quill-new": "^3.8.3",
     "recharts": "^3.8.0",
     "remark-gfm": "^4.0.1",
