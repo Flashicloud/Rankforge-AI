@@ -10,7 +10,7 @@ import { generateSEOContent, optimizeSEOContent } from './services/gemini';
 import { Search, Sparkles, FileText, AlertCircle, Copy, Check, Loader2, Layers, BarChart3, Target, Network, ShieldCheck, PenTool, ScanSearch, Zap, ChevronDown, ChevronUp, TrendingUp, BrainCircuit, Fingerprint, ArrowRight, Terminal, FileEdit, Brain, Globe, LogIn, LogOut, LayoutDashboard, Save, X, Menu, Lock } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import ReactQuill from 'react-quill-new';
-import 'react-quill/dist/quill.snow.css';
+import 'react-quill-new/dist/quill.snow.css';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 import TurndownService from 'turndown';
