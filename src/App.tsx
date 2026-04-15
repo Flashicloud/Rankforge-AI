@@ -7,7 +7,7 @@ import React, { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { generateSEOContent, optimizeSEOContent } from './services/gemini';
-import { Search, Sparkles, FileText, AlertCircle, Copy, Check, Loader2, Layers, BarChart3, Target, Network, ShieldCheck, PenTool, ScanSearch, Zap, ChevronDown, ChevronUp, TrendingUp, BrainCircuit, Fingerprint, ArrowRight, Terminal, FileEdit, Brain, Globe, LogIn, LogOut, LayoutDashboard, Save, X, Menu } from 'lucide-react';
+import { Search, Sparkles, FileText, AlertCircle, Copy, Check, Loader2, Layers, BarChart3, Target, Network, ShieldCheck, PenTool, ScanSearch, Zap, ChevronDown, ChevronUp, TrendingUp, BrainCircuit, Fingerprint, ArrowRight, Terminal, FileEdit, Brain, Globe, LogIn, LogOut, LayoutDashboard, Save, X, Menu, Lock } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import ReactQuill from 'react-quill-new';
 import 'react-quill/dist/quill.snow.css';
@@ -237,7 +237,7 @@ function LandingPage({ onStart, onShowAuth, user }: { onStart: () => void, onSho
             </div>
             <div className="hidden sm:block w-px h-10 bg-white/10"></div>
             <div className="text-center">
-              <div className="text-3xl font-black text-white stat-number">98<span className="text-purple-400">%</span></div>
+              <div className="text-3xl font-black text-white stat-number">70<span className="text-purple-400">%</span></div>
               <div className="text-xs text-zinc-500 uppercase tracking-widest mt-1">Human Score Rate</div>
             </div>
             <div className="hidden sm:block w-px h-10 bg-white/10"></div>
@@ -543,11 +543,17 @@ function LandingPage({ onStart, onShowAuth, user }: { onStart: () => void, onSho
                   </div>
                   <span>Basic SEO Scoring</span>
                 </li>
-                <li className="flex items-center gap-3 text-zinc-400 text-sm">
-                  <div className="w-5 h-5 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center flex-shrink-0">
-                    <Check className="w-3 h-3 text-emerald-400" />
+                <li className="flex items-center gap-3 text-zinc-600 text-sm line-through">
+                  <div className="w-5 h-5 rounded-full bg-white/5 flex items-center justify-center flex-shrink-0">
+                    <X className="w-3 h-3 text-zinc-600" />
                   </div>
                   <span>Content Optimization Tool</span>
+                </li>
+                <li className="flex items-center gap-3 text-zinc-600 text-sm line-through">
+                  <div className="w-5 h-5 rounded-full bg-white/5 flex items-center justify-center flex-shrink-0">
+                    <X className="w-3 h-3 text-zinc-600" />
+                  </div>
+                  <span>Research & Strategy Data</span>
                 </li>
                 <li className="flex items-center gap-3 text-zinc-600 text-sm line-through">
                   <div className="w-5 h-5 rounded-full bg-white/5 flex items-center justify-center flex-shrink-0">
@@ -579,7 +585,7 @@ function LandingPage({ onStart, onShowAuth, user }: { onStart: () => void, onSho
                 </div>
                 <div className="h-px bg-white/10 mb-6"></div>
                 <ul className="space-y-3.5 mb-8 flex-1">
-                  {['10 Articles per month', 'Advanced SEO Scoring & Analysis', 'Auto-Save to Dashboard', 'Priority Email Support'].map((item, i) => (
+                  {['10 Articles per month', 'Content Optimization Tool', 'Research & Strategy Data', 'Auto-Save to Dashboard'].map((item, i) => (
                     <li key={i} className="flex items-center gap-3 text-zinc-300 text-sm">
                       <div className="w-5 h-5 rounded-full bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center flex-shrink-0">
                         <Check className="w-3 h-3 text-indigo-400" />
@@ -727,18 +733,33 @@ export const extractArticleAndResearch = (fullText: string, currentMode: 'genera
   let article = fullText;
 
   if (currentMode === 'generate') {
-    // Look for Phase 5 Output
-    const phase5Match = fullText.match(/(?:^|\n)(?:## |### )?(?:PHASE 5|5\.)[^\n]*\n([\s\S]*?)(?:(?:^|\n)(?:## |### )?(?:PHASE 6|6\.)|$)/i);
+    // Try exact match first since runPhase appends exactly "## PHASE X OUTPUT"
+    const p5Marker = '## PHASE 5 OUTPUT';
+    const p6Marker = '## PHASE 6 OUTPUT';
+    
+    const p5Index = fullText.indexOf(p5Marker);
+    if (p5Index !== -1) {
+      const startIdx = fullText.indexOf('\n', p5Index);
+      const p6Index = fullText.indexOf(p6Marker, startIdx);
+      
+      if (p6Index !== -1) {
+        article = fullText.substring(startIdx, p6Index).trim();
+      } else {
+        article = fullText.substring(startIdx).trim();
+      }
+      return { article, research };
+    }
+
+    // Fallback regex if exact marker is missing
+    const phase5Match = fullText.match(/(?:^|\n)[ \t]*(?:## |### |\*\*|__)*[ \t]*(?:PHASE 5|5\.)[^\n]*\n([\s\S]*?)(?:(?:^|\n)[ \t]*(?:## |### |\*\*|__)*[ \t]*(?:PHASE 6|6\.)|$)/i);
     if (phase5Match) {
       article = phase5Match[1].trim();
-      research = fullText.replace(phase5Match[0], '\n\n> **[Final Article Content Moved to "Final Article" Tab]**\n\n').trim();
     }
   } else {
     // Optimize mode: Article is usually in Phase 7
-    const phase7Match = fullText.match(/(?:^|\n)(?:## |### )?(?:PHASE 7|7\.)[^\n]*\n([\s\S]*?)(?:(?:^|\n)(?:## |### )?(?:PHASE 8|8\.)|$)/i);
+    const phase7Match = fullText.match(/(?:^|\n)[ \t]*(?:## |### |\*\*|__)*[ \t]*(?:PHASE 7|7\.)[^\n]*\n([\s\S]*?)(?:(?:^|\n)[ \t]*(?:## |### |\*\*|__)*[ \t]*(?:PHASE 8|8\.)|$)/i);
     if (phase7Match) {
       article = phase7Match[1].trim();
-      research = fullText.replace(phase7Match[0], '\n\n> **[Optimized Article Content Moved to "Final Article" Tab]**\n\n').trim();
     }
   }
 
@@ -754,7 +775,6 @@ export default function App() {
   const [existingArticle, setExistingArticle] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [content, setContent] = useState<string | null>(null);
-  const [researchContent, setResearchContent] = useState<string>('');
   const [activeTab, setActiveTab] = useState<'article' | 'research'>('article');
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -771,6 +791,9 @@ export default function App() {
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [scrapeStats, setScrapeStats] = useState<{ success: number; failed: number; total: number } | null>(null);
+  const [userPlan, setUserPlan] = useState<'free' | 'starter' | 'pro'>('free');
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -793,6 +816,95 @@ export default function App() {
     }));
   };
 
+  const renderPhaseCards = () => {
+    if (Object.keys(phaseOutputs).length === 0) {
+      return (
+        <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-8 text-center">
+          <p className="text-zinc-400">No research data available for this article.</p>
+        </div>
+      );
+    }
+    
+    return (
+      <div className="space-y-6 w-full max-w-5xl mx-auto mb-12 mt-12">
+        {Object.entries(phaseOutputs).map(([id, output]) => {
+          const phaseId = parseInt(id);
+          const phase = generatePhases.find(p => p.id === phaseId) || { title: `Phase ${phaseId}`, icon: FileText, color: 'text-white', border: 'border-white/10', bg: 'bg-zinc-900' };
+          const isExpanded = expandedPhases[phaseId];
+          
+          return (
+            <motion.div 
+              key={phaseId}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className={`rounded-2xl border ${phase.border} bg-white/5 backdrop-blur-xl overflow-hidden shadow-2xl transition-all duration-300`}
+            >
+              <div 
+                onClick={() => togglePhase(phaseId)}
+                className={`px-6 py-4 border-b ${phase.border} bg-black/40 flex items-center justify-between cursor-pointer hover:bg-black/60 transition-colors`}
+              >
+                <div className="flex items-center gap-3">
+                  <div className={`p-1.5 rounded-lg bg-white/10 ${phase.color}`}>
+                    <phase.icon className="w-4 h-4" />
+                  </div>
+                  <h3 className={`font-bold text-sm uppercase tracking-wider ${phase.color}`}>
+                    Phase {phaseId}: {phase.title}
+                  </h3>
+                </div>
+                <div className="flex items-center gap-4">
+                  {/* Copy Button for Phase 5 */}
+                  {phaseId === 5 && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigator.clipboard.writeText(String(output).replace(/^## PHASE \d+ OUTPUT\n/, ''));
+                        const btn = e.currentTarget;
+                        const originalText = btn.innerHTML;
+                        btn.innerHTML = `<svg class="w-3 h-3 text-emerald-400" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg><span class="text-emerald-400">Copied</span>`;
+                        setTimeout(() => {
+                          btn.innerHTML = originalText;
+                        }, 2000);
+                      }}
+                      className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/20 px-3 py-1.5 rounded-lg transition-all"
+                    >
+                      <Copy className="w-3 h-3" />
+                      Copy Article
+                    </button>
+                  )}
+                  
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-mono text-zinc-500 uppercase">Completed</span>
+                    <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
+                  </div>
+                  {isExpanded ? <ChevronUp className="w-4 h-4 text-zinc-500" /> : <ChevronDown className="w-4 h-4 text-zinc-500" />}
+                </div>
+              </div>
+              
+              <AnimatePresence>
+                {isExpanded && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <div className="p-6 max-h-[400px] overflow-y-auto custom-scrollbar bg-[#0a0a0a]">
+                      <div className="markdown-body max-w-none dark-mode text-sm">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                          {String(output).replace(/^## PHASE \d+ OUTPUT\n/, '')}
+                        </ReactMarkdown>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          );
+        })}
+      </div>
+    );
+  };
+
   if (view === 'landing') {
     return (
       <>
@@ -812,6 +924,7 @@ export default function App() {
     setSeoScore(null);
     setPhaseOutputs({});
     setExpandedPhases({});
+    setScrapeStats(null);
     setStatusMessage('Initializing Agent...');
 
     try {
@@ -836,7 +949,7 @@ export default function App() {
               [phaseId]: true
             }));
           }
-        }, includePhase0);
+        }, includePhase0, (stats) => setScrapeStats(stats));
         
         finalContent = result || "No content generated. Please try again.";
         
@@ -867,9 +980,8 @@ export default function App() {
             }
         }
         
-        const { article, research } = extractArticleAndResearch(finalContent, 'generate');
+        const { article } = extractArticleAndResearch(finalContent, 'generate');
         setContent(finalContent);
-        setResearchContent(research);
         
         // Convert Markdown to HTML for the Rich Text Editor
         const html = await marked.parse(article);
@@ -910,9 +1022,8 @@ export default function App() {
             }
         }
         
-        const { article, research } = extractArticleAndResearch(finalContent, 'optimize');
+        const { article } = extractArticleAndResearch(finalContent, 'optimize');
         setContent(finalContent);
-        setResearchContent(research);
         
         // Convert Markdown to HTML for the Rich Text Editor
         const html = await marked.parse(article);
@@ -1070,10 +1181,17 @@ export default function App() {
                 <Brain className="w-4 h-4" /> Generate New Article
               </button>
               <button
-                onClick={() => { setMode('optimize'); setContent(null); setError(null); }}
+                onClick={() => { 
+                  if (userPlan === 'free') {
+                    setShowUpgradeModal(true);
+                  } else {
+                    setMode('optimize'); setContent(null); setError(null); 
+                  }
+                }}
                 className={`flex items-center gap-2.5 px-7 py-3 rounded-xl text-sm font-bold transition-all duration-200 ${mode === 'optimize' ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/25' : 'text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.05]'}`}
               >
                 <FileEdit className="w-4 h-4" /> Optimize Existing
+                {userPlan === 'free' && <Lock className="w-3 h-3 ml-1 opacity-50" />}
               </button>
             </div>
           </div>
@@ -1096,7 +1214,7 @@ export default function App() {
             </h2>
             <p className="text-lg text-zinc-400 mb-10 leading-relaxed max-w-2xl mx-auto">
               {mode === 'generate' 
-                ? 'Execute a 7-phase architectural analysis to reverse-engineer competitors and satisfy user intent.'
+                ? 'Execute a 7-phase architectural analysis to deeply analyze competitors and satisfy user intent.'
                 : 'Audit, diagnose, and upgrade your underperforming articles for modern Google ranking systems.'}
             </p>
 
@@ -1346,88 +1464,7 @@ export default function App() {
         )}
 
         {/* Phase Outputs Grid - Visible during generation */}
-        {Object.keys(phaseOutputs).length > 0 && isGenerating && (
-          <div className="space-y-6 w-full max-w-5xl mx-auto mb-12 mt-12">
-            {Object.entries(phaseOutputs).map(([id, output]) => {
-              const phaseId = parseInt(id);
-              const phase = generatePhases.find(p => p.id === phaseId) || { title: `Phase ${phaseId}`, icon: FileText, color: 'text-white', border: 'border-white/10', bg: 'bg-zinc-900' };
-              const isExpanded = expandedPhases[phaseId];
-              
-              return (
-                <motion.div 
-                  key={phaseId}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className={`rounded-2xl border ${phase.border} bg-white/5 backdrop-blur-xl overflow-hidden shadow-2xl transition-all duration-300`}
-                >
-                  <div 
-                    onClick={() => togglePhase(phaseId)}
-                    className={`px-6 py-4 border-b ${phase.border} bg-black/40 flex items-center justify-between cursor-pointer hover:bg-black/60 transition-colors`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={`p-1.5 rounded-lg bg-white/10 ${phase.color}`}>
-                        <phase.icon className="w-4 h-4" />
-                      </div>
-                      <h3 className={`font-bold text-sm uppercase tracking-wider ${phase.color}`}>
-                        Phase {phaseId}: {phase.title}
-                      </h3>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      {/* Copy Button for Phase 5 */}
-                      {phaseId === 5 && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigator.clipboard.writeText(String(output).replace(/^## PHASE \d+ OUTPUT\n/, ''));
-                            // Optional: Add visual feedback for this specific button if needed
-                            // For now, using the global copied state or a simple alert might be confusing
-                            // Let's just rely on the action. Or better, reuse the copied state logic but localised?
-                            // To keep it simple as per request, just the button.
-                            const btn = e.currentTarget;
-                            const originalText = btn.innerHTML;
-                            btn.innerHTML = `<svg class="w-3 h-3 text-emerald-400" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg><span class="text-emerald-400">Copied</span>`;
-                            setTimeout(() => {
-                              btn.innerHTML = originalText;
-                            }, 2000);
-                          }}
-                          className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/20 px-3 py-1.5 rounded-lg transition-all"
-                        >
-                          <Copy className="w-3 h-3" />
-                          Copy Article
-                        </button>
-                      )}
-                      
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-mono text-zinc-500 uppercase">Completed</span>
-                        <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-                      </div>
-                      {isExpanded ? <ChevronUp className="w-4 h-4 text-zinc-500" /> : <ChevronDown className="w-4 h-4 text-zinc-500" />}
-                    </div>
-                  </div>
-                  
-                  <AnimatePresence>
-                    {isExpanded && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3 }}
-                      >
-                        <div className="p-6 max-h-[400px] overflow-y-auto custom-scrollbar bg-[#0a0a0a]">
-                          <div className="markdown-body max-w-none dark-mode text-sm">
-                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                              {String(output).replace(/^## PHASE \d+ OUTPUT\n/, '')}
-                            </ReactMarkdown>
-                          </div>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </motion.div>
-              );
-            })}
-          </div>
-        )}
+        {isGenerating && Object.keys(phaseOutputs).length > 0 && renderPhaseCards()}
 
         {/* Content Display */}
         {content && (
@@ -1450,6 +1487,43 @@ export default function App() {
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
+                  {scrapeStats && (
+                    <div className="group relative">
+                      <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium cursor-help transition-all duration-300 ${
+                        scrapeStats.failed === 0 
+                          ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20 hover:shadow-[0_0_15px_rgba(16,185,129,0.2)]'
+                          : scrapeStats.success > 0
+                            ? 'bg-amber-500/10 border-amber-500/20 text-amber-400 hover:bg-amber-500/20 hover:shadow-[0_0_15px_rgba(245,158,11,0.2)]'
+                            : 'bg-red-500/10 border-red-500/20 text-red-400 hover:bg-red-500/20 hover:shadow-[0_0_15px_rgba(239,68,68,0.2)]'
+                      }`}>
+                        <Target className="w-3.5 h-3.5" />
+                        <span>{scrapeStats.success}/{scrapeStats.total} Analyzed</span>
+                      </div>
+                      
+                      {/* Tooltip */}
+                      <div className="absolute bottom-full right-0 mb-2 w-56 p-3 rounded-xl bg-zinc-900 border border-white/10 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                        <div className="text-xs space-y-2">
+                          <div className="flex justify-between items-center text-zinc-300">
+                            <span>Total URLs found:</span>
+                            <span className="font-mono text-white">{scrapeStats.total}</span>
+                          </div>
+                          <div className="flex justify-between items-center text-emerald-400">
+                            <span>Successfully scraped:</span>
+                            <span className="font-mono">{scrapeStats.success}</span>
+                          </div>
+                          <div className="flex justify-between items-center text-red-400">
+                            <span>Blocked/Failed:</span>
+                            <span className="font-mono">{scrapeStats.failed}</span>
+                          </div>
+                          {scrapeStats.failed > 0 && (
+                            <div className="pt-2 mt-2 border-t border-white/10 text-zinc-500 leading-relaxed">
+                              Some sites block automated access. We used internal knowledge to fill the gaps.
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
                   <button
                     onClick={async () => {
                       if (!user) {
@@ -1682,11 +1756,18 @@ export default function App() {
                     Final Article
                   </button>
                   <button 
-                    onClick={() => setActiveTab('research')}
+                    onClick={() => {
+                      if (userPlan === 'free') {
+                        setShowUpgradeModal(true);
+                      } else {
+                        setActiveTab('research');
+                      }
+                    }}
                     className={`px-6 py-3 rounded-xl font-bold transition-all duration-300 flex items-center gap-2.5 ${activeTab === 'research' ? 'bg-indigo-500 text-white shadow-[0_0_20px_rgba(99,102,241,0.3)]' : 'bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10 border border-white/5 hover:border-white/10 backdrop-blur-sm'}`}
                   >
                     <BrainCircuit className="w-4 h-4" />
                     Research & Strategy
+                    {userPlan === 'free' && <Lock className="w-3 h-3 ml-1 opacity-50" />}
                   </button>
                 </div>
 
@@ -1709,10 +1790,8 @@ export default function App() {
                     />
                   </div>
                 ) : (
-                  <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-8 prose prose-invert max-w-none custom-scrollbar overflow-y-auto max-h-[800px] shadow-inner">
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                      {researchContent || "No research data available."}
-                    </ReactMarkdown>
+                  <div className="w-full">
+                    {renderPhaseCards()}
                   </div>
                 )}
               </div>
@@ -1723,6 +1802,51 @@ export default function App() {
         </>
         )}
       </main>
+
+      {/* Upgrade Modal */}
+      {showUpgradeModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-[#111118] border border-white/10 rounded-2xl p-8 max-w-md w-full relative shadow-2xl"
+          >
+            <button 
+              onClick={() => setShowUpgradeModal(false)}
+              className="absolute top-4 right-4 text-zinc-500 hover:text-white transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <div className="w-12 h-12 rounded-full bg-indigo-500/10 flex items-center justify-center mb-6">
+              <Lock className="w-6 h-6 text-indigo-400" />
+            </div>
+            <h3 className="text-2xl font-bold text-white mb-3">Premium Feature</h3>
+            <p className="text-zinc-400 mb-8 leading-relaxed">
+              This feature is only available on Starter and Pro plans. Upgrade your account to unlock advanced research data and content optimization tools.
+            </p>
+            <div className="flex gap-3">
+              <button 
+                onClick={() => setShowUpgradeModal(false)}
+                className="flex-1 py-3 rounded-xl font-bold text-sm text-zinc-300 hover:text-white bg-white/5 hover:bg-white/10 transition-colors"
+              >
+                Maybe Later
+              </button>
+              <button 
+                onClick={() => {
+                  setShowUpgradeModal(false);
+                  setView('landing');
+                  setTimeout(() => {
+                    document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' });
+                  }, 100);
+                }}
+                className="flex-1 py-3 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 shadow-lg shadow-indigo-500/25 transition-all"
+              >
+                View Plans
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }

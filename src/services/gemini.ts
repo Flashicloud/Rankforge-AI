@@ -25,7 +25,8 @@ async function runPhase(
   contentType: string,
   wordRange: string,
   additionalContext: string,
-  onProgress?: (status: string, partialOutput?: string) => void
+  onProgress?: (status: string, partialOutput?: string) => void,
+  onScrapeComplete?: (stats: { success: number; failed: number; total: number }) => void
 ): Promise<string> {
   if (onProgress) onProgress(`Executing Phase ${phaseId}: ${phaseName} (${model})...`);
 
@@ -89,6 +90,7 @@ async function runPhase(
         console.error("Scraper API Error:", data.error);
         if (onProgress) onProgress(`Scraping Error: ${data.error}`);
         scrapedDataText = `\n\n(Note: Live SERP scraping failed due to API error. Rely on your internal knowledge.)\n`;
+        if (onScrapeComplete) onScrapeComplete({ success: 0, failed: 0, total: 0 });
       } else if (data.success && data.data && data.data.length > 0) {
         scrapedDataText = `\n\n*** LIVE SERP SCRAPED DATA (GOOGLE SEARCH) ***\nHere is the actual content from the top ranking pages for "${keyword}":\n`;
         let successCount = 0;
@@ -105,10 +107,12 @@ async function runPhase(
         scrapedDataText += `\nUse this exact scraped data to perform your N-Gram analysis, entity extraction, and competitor benchmarking instead of hallucinating.\n`;
         
         if (onProgress) onProgress(`Scraping Complete: ${successCount} URLs read successfully, ${failCount} blocked/failed.`);
+        if (onScrapeComplete) onScrapeComplete({ success: successCount, failed: failCount, total: data.data.length });
       }
     } catch (e) {
       console.error("Failed to scrape SERP data:", e);
       scrapedDataText = `\n\n(Note: Live SERP scraping failed. Rely on your internal knowledge.)\n`;
+      if (onScrapeComplete) onScrapeComplete({ success: 0, failed: 0, total: 0 });
     }
     if (onProgress) onProgress(`Executing Phase ${phaseId}: ${phaseName} (${model})...`);
   }
@@ -160,7 +164,8 @@ export async function generateSEOContent(
   additionalContext: string,
   brandVoice: string = "",
   onProgress?: (status: string, partialOutput?: string) => void,
-  includePhase0: boolean = true
+  includePhase0: boolean = true,
+  onScrapeComplete?: (stats: { success: number; failed: number; total: number }) => void
 ) {
   try {
     let accumulatedContext = "";
@@ -173,7 +178,7 @@ export async function generateSEOContent(
 
     // Phase 0: Structural Variation (gemini-3-flash-preview)
     if (includePhase0) {
-      const p0 = await runPhase(0, "Structural Variation", "gemini-3-flash-preview", accumulatedContext, keyword, contentType, wordRange, combinedContext, onProgress);
+      const p0 = await runPhase(0, "Structural Variation", "gemini-3-flash-preview", accumulatedContext, keyword, contentType, wordRange, combinedContext, onProgress, onScrapeComplete);
       accumulatedContext += p0;
     } else {
       if (onProgress) onProgress("Skipping Phase 0: Structural Variation...");
@@ -181,27 +186,27 @@ export async function generateSEOContent(
     }
 
     // Phase 1: SERP Intelligence (gemini-3-pro-preview)
-    const p1 = await runPhase(1, "SERP Intelligence", "gemini-3-pro-preview", accumulatedContext, keyword, contentType, wordRange, combinedContext, onProgress);
+    const p1 = await runPhase(1, "SERP Intelligence", "gemini-3-pro-preview", accumulatedContext, keyword, contentType, wordRange, combinedContext, onProgress, onScrapeComplete);
     accumulatedContext += p1;
 
     // Phase 2: Intent Enforcement (gemini-3-flash-preview)
-    const p2 = await runPhase(2, "Intent Enforcement", "gemini-3-flash-preview", accumulatedContext, keyword, contentType, wordRange, combinedContext, onProgress);
+    const p2 = await runPhase(2, "Intent Enforcement", "gemini-3-flash-preview", accumulatedContext, keyword, contentType, wordRange, combinedContext, onProgress, onScrapeComplete);
     accumulatedContext += p2;
 
     // Phase 3: Semantic Architecture (gemini-3-flash-preview)
-    const p3 = await runPhase(3, "Semantic Architecture", "gemini-3-flash-preview", accumulatedContext, keyword, contentType, wordRange, combinedContext, onProgress);
+    const p3 = await runPhase(3, "Semantic Architecture", "gemini-3-flash-preview", accumulatedContext, keyword, contentType, wordRange, combinedContext, onProgress, onScrapeComplete);
     accumulatedContext += p3;
 
     // Phase 4: E-E-A-T++ Framework (gemini-3-flash-preview)
-    const p4 = await runPhase(4, "E-E-A-T++ Framework", "gemini-3-flash-preview", accumulatedContext, keyword, contentType, wordRange, combinedContext, onProgress);
+    const p4 = await runPhase(4, "E-E-A-T++ Framework", "gemini-3-flash-preview", accumulatedContext, keyword, contentType, wordRange, combinedContext, onProgress, onScrapeComplete);
     accumulatedContext += p4;
 
     // Phase 5: Content Creation (gemini-3.1-pro-preview)
-    const p5 = await runPhase(5, "Content Creation", "gemini-3.1-pro-preview", accumulatedContext, keyword, contentType, wordRange, combinedContext, onProgress);
+    const p5 = await runPhase(5, "Content Creation", "gemini-3.1-pro-preview", accumulatedContext, keyword, contentType, wordRange, combinedContext, onProgress, onScrapeComplete);
     accumulatedContext += p5;
 
     // Phase 6: AI Visibility Check (gemini-3-flash-preview)
-    const p6 = await runPhase(6, "AI Visibility Check", "gemini-3-flash-preview", accumulatedContext, keyword, contentType, wordRange, combinedContext, onProgress);
+    const p6 = await runPhase(6, "AI Visibility Check", "gemini-3-flash-preview", accumulatedContext, keyword, contentType, wordRange, combinedContext, onProgress, onScrapeComplete);
     accumulatedContext += p6;
 
     return accumulatedContext;
