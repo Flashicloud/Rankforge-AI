@@ -1,16 +1,24 @@
-import { GoogleGenAI } from "@google/genai";
+import OpenAI from "openai";
 import { SEO_ARCHITECT_PROMPT, ARTICLE_OPTIMIZATION_PROMPT } from "../constants";
 
-let aiInstance: GoogleGenAI | null = null;
+let aiInstance: OpenAI | null = null;
 
 function getAI() {
   if (!aiInstance) {
     // Try process.env first (for AI Studio environment), then fallback to import.meta.env (for Vite/Hostinger)
-    const apiKey = process.env.GEMINI_API_KEY || (import.meta as any).env?.VITE_GEMINI_API_KEY;
+    const apiKey = process.env.OPENROUTER_API_KEY || (import.meta as any).env?.VITE_OPENROUTER_API_KEY;
     if (!apiKey) {
-      throw new Error("Gemini API Key is missing. Please add VITE_GEMINI_API_KEY to your environment variables on Hostinger.");
+      throw new Error("OpenRouter API Key is missing. Please add VITE_OPENROUTER_API_KEY to your environment variables on Hostinger.");
     }
-    aiInstance = new GoogleGenAI({ apiKey });
+    aiInstance = new OpenAI({
+      baseURL: "https://openrouter.ai/api/v1",
+      apiKey: apiKey,
+      dangerouslyAllowBrowser: true, // Required for frontend usage
+      defaultHeaders: {
+        "HTTP-Referer": window.location?.origin || "https://seowriter.app",
+        "X-Title": "SEO Content Human Writer",
+      }
+    });
   }
   return aiInstance;
 }
@@ -136,20 +144,17 @@ async function runPhase(
     Output ONLY the result for Phase ${phaseId}.
   `;
 
-  // Determine tools config based on phase
-  // We no longer use internal googleSearch to avoid confusion with our custom scraper
-  const tools = undefined;
+  // Determine OpenRouter model based on the requested model
+  // Using Claude Sonnet 4.6 as requested
+  let orModel = "anthropic/claude-4.6-sonnet"; 
 
-  const response = await getAI().models.generateContent({
-    model: model,
-    contents: prompt,
-    config: {
-      tools: tools,
-      temperature: 0.7,
-    },
+  const response = await getAI().chat.completions.create({
+    model: orModel,
+    messages: [{ role: "user", content: prompt }],
+    temperature: 0.7,
   });
 
-  const output = `\n\n## PHASE ${phaseId} OUTPUT\n${response.text}`;
+  const output = `\n\n## PHASE ${phaseId} OUTPUT\n${response.choices[0].message.content}`;
   
   // Send the output immediately to the UI
   if (onProgress) onProgress(`Completed Phase ${phaseId}: ${phaseName}`, output);
@@ -255,19 +260,18 @@ export async function optimizeSEOContent(
     let currentPhase = 1;
 
     try {
-      const responseStream = await getAI().models.generateContentStream({
-        model: "gemini-3.1-pro-preview",
-        contents: prompt,
-        config: {
-          temperature: 0.7,
-          tools: [{ googleSearch: {} }]
-        }
+      const responseStream = await getAI().chat.completions.create({
+        model: "anthropic/claude-4.6-sonnet",
+        messages: [{ role: "user", content: prompt }],
+        temperature: 0.7,
+        stream: true,
       });
 
       for await (const chunk of responseStream) {
         try {
-          if (chunk.text) {
-            fullText += chunk.text;
+          const text = chunk.choices[0]?.delta?.content || "";
+          if (text) {
+            fullText += text;
           }
         } catch (e) {
           // Ignore chunk text extraction errors
@@ -301,14 +305,12 @@ export async function optimizeSEOContent(
       console.warn("Streaming failed, falling back to standard generation...", streamError);
       if (onProgress) onProgress("Network stream interrupted. Resuming optimization in background (this may take a minute)...");
       
-      const response = await getAI().models.generateContent({
-        model: "gemini-3.1-pro-preview",
-        contents: prompt,
-        config: {
-          temperature: 0.7,
-        }
+      const response = await getAI().chat.completions.create({
+        model: "anthropic/claude-4.6-sonnet",
+        messages: [{ role: "user", content: prompt }],
+        temperature: 0.7,
       });
-      fullText = response.text || "";
+      fullText = response.choices[0].message.content || "";
     }
     
     if (onProgress) onProgress("Optimization Complete!");
