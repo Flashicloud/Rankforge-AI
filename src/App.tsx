@@ -1244,7 +1244,10 @@ export default function App() {
               setContent(article.content);
               setSeoScore(article.seoScore || null);
               setPhaseOutputs({});
-              const html = await marked.parse(article.content);
+              
+              const { article: finalArticleText } = extractArticleAndResearch(article.content, article.mode);
+              
+              const html = await marked.parse(finalArticleText);
               const cleanHtml = DOMPurify.sanitize(html);
               setEditableContent(cleanHtml);
               setView('app');
@@ -1558,7 +1561,7 @@ export default function App() {
           >
             <div className="bg-white/5 backdrop-blur-2xl rounded-3xl border border-white/10 overflow-hidden shadow-2xl ring-1 ring-white/5 relative">
               <div className="absolute inset-0 bg-gradient-to-b from-indigo-500/5 via-transparent to-transparent pointer-events-none"></div>
-              <div className="border-b border-white/10 bg-black/40 px-6 py-4 flex items-center justify-between sticky top-20 z-20 backdrop-blur-xl">
+              <div className="border-b border-white/10 bg-black/40 px-6 py-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 sticky top-16 md:top-20 z-20 backdrop-blur-xl">
                 <div className="flex items-center gap-4">
                   <div className="bg-emerald-500/10 text-emerald-400 p-2 rounded-full ring-1 ring-emerald-500/20">
                     <Check className="w-4 h-4" />
@@ -1568,7 +1571,7 @@ export default function App() {
                     <p className="text-xs text-zinc-500 mt-1 font-mono">Target: {keyword}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
                   {scrapeStats && (
                     <div className="group relative">
                       <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium cursor-help transition-all duration-300 ${

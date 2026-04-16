@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { X, Mail, Lock, AlertCircle, Sparkles } from 'lucide-react';
+import { X, Mail, Lock, AlertCircle, Sparkles, Eye, EyeOff } from 'lucide-react';
 import { signInWithGoogle, signUpWithEmail, signInWithEmail } from '../services/firebase';
 
 const ALLOWED_DOMAINS = ['gmail.com', 'yahoo.com', 'hotmail.com', 'protonmail.com', 'proton.me'];
@@ -9,6 +9,7 @@ export default function AuthModal({ onClose }: { onClose: () => void }) {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -122,14 +123,25 @@ export default function AuthModal({ onClose }: { onClose: () => void }) {
                     <Lock className="w-5 h-5 text-zinc-500 group-focus-within:text-indigo-400 transition-colors" />
                   </div>
                   <input
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full bg-black/50 border border-white/10 rounded-xl py-3 pl-11 pr-4 text-white placeholder-zinc-600 focus:outline-none focus:border-indigo-500/50 focus:ring-2 focus:ring-indigo-500/20 transition-all"
+                    className="w-full bg-black/50 border border-white/10 rounded-xl py-3 pl-11 pr-12 text-white placeholder-zinc-600 focus:outline-none focus:border-indigo-500/50 focus:ring-2 focus:ring-indigo-500/20 transition-all"
                     placeholder="••••••••"
                     minLength={6}
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-zinc-500 hover:text-zinc-300 transition-colors focus:outline-none"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-5 h-5" />
+                    ) : (
+                      <Eye className="w-5 h-5" />
+                    )}
+                  </button>
                 </div>
               </div>
 
