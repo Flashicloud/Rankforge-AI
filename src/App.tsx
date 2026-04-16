@@ -214,17 +214,17 @@ function LandingPage({ onStart, onShowAuth, user }: { onStart: () => void, onSho
       </nav>
 
       {/* Hero Section */}
-      <div className="relative pt-28 pb-16 sm:pt-36 sm:pb-20 lg:pt-48 lg:pb-28 overflow-hidden bg-grid">
+      <section className="relative pt-28 pb-16 sm:pt-36 sm:pb-20 lg:pt-48 lg:pb-28 overflow-hidden bg-grid">
         {/* Ambient blobs */}
         <div className="absolute top-0 left-1/4 w-[300px] sm:w-[600px] h-[300px] sm:h-[600px] bg-indigo-600/20 rounded-full blur-[80px] sm:blur-[130px] opacity-60 pointer-events-none"></div>
         <div className="absolute top-20 right-1/4 w-[200px] sm:w-[400px] h-[200px] sm:h-[400px] bg-purple-600/15 rounded-full blur-[60px] sm:blur-[100px] opacity-50 pointer-events-none"></div>
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[400px] sm:w-[800px] h-[150px] sm:h-[300px] bg-indigo-900/20 rounded-full blur-[50px] sm:blur-[80px] pointer-events-none"></div>
 
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 relative z-10 text-center">
+        <header className="max-w-5xl mx-auto px-4 sm:px-6 relative z-10 text-center">
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/25 text-indigo-300 text-[10px] sm:text-xs font-semibold mb-6 sm:mb-8 uppercase tracking-widest">
             <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse inline-block"></span>
-            The Next Generation of SEO Content
+            Powered by Claude 4.6 Sonnet & Live SERP Data
           </div>
 
           {/* Headline */}
@@ -238,7 +238,7 @@ function LandingPage({ onStart, onShowAuth, user }: { onStart: () => void, onSho
           </h1>
 
           <p className="text-base sm:text-lg md:text-xl text-zinc-400 max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed font-light px-2 sm:px-0">
-            Not another text generator. A comprehensive <span className="text-white font-medium">AI SEO content engine</span> that analyzes live SERPs, maps semantic entities, and writes human-quality articles built to rank on Google.
+            Not just another text generator. A powerful <span className="text-white font-medium">Hybrid AI SEO Engine</span> that scrapes live SERPs, maps semantic entities, and writes human-quality articles using advanced Anthropic models.
           </p>
 
           {/* CTA Buttons */}
@@ -279,8 +279,8 @@ function LandingPage({ onStart, onShowAuth, user }: { onStart: () => void, onSho
               <div className="text-xs text-zinc-500 uppercase tracking-widest mt-1">Articles Generated</div>
             </div>
           </div>
-        </div>
-      </div>
+        </header>
+      </section>
 
       {/* Marquee Ticker */}
       <div className="py-5 border-y border-white/[0.06] bg-white/[0.02] marquee-wrapper">
@@ -296,54 +296,54 @@ function LandingPage({ onStart, onShowAuth, user }: { onStart: () => void, onSho
       </div>
 
       {/* Features Section */}
-      <div id="features" className="py-28 bg-[#080810]">
+      <section id="features" className="py-28 bg-[#080810]">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-16">
+          <header className="text-center mb-16">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-zinc-400 text-xs font-semibold uppercase tracking-widest mb-5">
               Core Capabilities
             </div>
             <h2 className="text-4xl md:text-5xl font-black text-white mb-5 tracking-tight">Why Choose Our AI Writing Assistant?</h2>
             <p className="text-zinc-400 max-w-xl mx-auto text-lg">Built for SEO professionals and content creators who demand quality over quantity.</p>
-          </div>
+          </header>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Card 1 */}
-            <div className="gradient-border card-glow group cursor-default p-8">
+            <article className="gradient-border card-glow group cursor-default p-8">
               <div className="w-14 h-14 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-indigo-500/20 group-hover:scale-110 transition-all duration-300">
                 <Globe className="w-7 h-7 text-indigo-400" />
               </div>
               <div className="text-[10px] font-bold uppercase tracking-widest text-indigo-400 mb-2">Feature 01</div>
               <h3 className="text-xl font-bold mb-3 text-white">Live SERP Analysis</h3>
-              <p className="text-zinc-500 leading-relaxed text-sm">Our <strong className="text-zinc-300">AI article writer</strong> doesn't guess. It scrapes the top results in real-time to understand exactly what search intent to target.</p>
-            </div>
+              <p className="text-zinc-500 leading-relaxed text-sm">Our <strong className="text-zinc-300">programmatic SEO engine</strong> doesn't guess. It scrapes the top results in real-time to understand exactly what search intent to target.</p>
+            </article>
 
             {/* Card 2 */}
-            <div className="gradient-border card-glow group cursor-default p-8" style={{background: '#111118'}}>
+            <article className="gradient-border card-glow group cursor-default p-8" style={{background: '#111118'}}>
               <div className="w-14 h-14 bg-purple-500/10 border border-purple-500/20 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-purple-500/20 group-hover:scale-110 transition-all duration-300">
-                <TrendingUp className="w-7 h-7 text-purple-400" />
+                <BrainCircuit className="w-7 h-7 text-purple-400" />
               </div>
               <div className="text-[10px] font-bold uppercase tracking-widest text-purple-400 mb-2">Feature 02</div>
-              <h3 className="text-xl font-bold mb-3 text-white">Surfer-Level NLP Pipeline</h3>
-              <p className="text-zinc-500 leading-relaxed text-sm">Acts like Surfer SEO on autopilot. Injects missing semantic entities, LSI keywords, and optimizes NLP scores to boost your topical authority.</p>
-            </div>
+              <h3 className="text-xl font-bold mb-3 text-white">Hybrid AI Architecture</h3>
+              <p className="text-zinc-500 leading-relaxed text-sm">Combines the speed of <strong className="text-zinc-300">Claude 4.5 Haiku</strong> for semantic gap detection with the reasoning power of <strong className="text-zinc-300">Claude 4.6 Sonnet</strong> for expert-level writing.</p>
+            </article>
 
             {/* Card 3 */}
-            <div className="gradient-border card-glow group cursor-default p-8">
+            <article className="gradient-border card-glow group cursor-default p-8">
               <div className="w-14 h-14 bg-pink-500/10 border border-pink-500/20 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-pink-500/20 group-hover:scale-110 transition-all duration-300">
                 <ShieldCheck className="w-7 h-7 text-pink-400" />
               </div>
               <div className="text-[10px] font-bold uppercase tracking-widest text-pink-400 mb-2">Feature 03</div>
               <h3 className="text-xl font-bold mb-3 text-white">E-E-A-T Compliant</h3>
-              <p className="text-zinc-500 leading-relaxed text-sm">Unlike basic AI generators, RankForge structures content to highlight Experience, Expertise, Authoritativeness, and Trustworthiness.</p>
-            </div>
+              <p className="text-zinc-500 leading-relaxed text-sm">Unlike basic AI generators, RankForge structures content to highlight Experience, Expertise, Authoritativeness, and Trustworthiness for Google's SGE.</p>
+            </article>
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Professional Landing Page Content */}
-      <div className="pt-20 pb-4 border-t border-white/[0.06] bg-[#0a0a12] max-w-full">
+      <section className="pt-20 pb-4 border-t border-white/[0.06] bg-[#0a0a12] max-w-full">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center max-w-3xl mx-auto mb-20">
+        <header className="text-center max-w-3xl mx-auto mb-20">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-zinc-400 text-xs font-semibold uppercase tracking-widest mb-5">
             Deep Dive
           </div>
@@ -354,7 +354,7 @@ function LandingPage({ onStart, onShowAuth, user }: { onStart: () => void, onSho
           <p className="text-zinc-400 text-lg leading-relaxed">
             Stop publishing generic AI content penalized by Google. Whether generating new articles or rescuing underperforming pages, we build human-first, intent-optimized content that search engines reward.
           </p>
-        </div>
+        </header>
 
         {/* Why Use This Tool Section */}
         <div className="mb-32">
@@ -367,7 +367,7 @@ function LandingPage({ onStart, onShowAuth, user }: { onStart: () => void, onSho
           <div className="mb-16">
             <h4 className="text-lg font-bold text-indigo-400 mb-6 flex items-center gap-2 justify-center"><Brain className="w-5 h-5" /> For Generating New Content</h4>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="bg-zinc-900/30 border border-white/5 p-8 rounded-2xl hover:bg-zinc-900/50 transition-colors">
+              <article className="bg-zinc-900/30 border border-white/5 p-8 rounded-2xl hover:bg-zinc-900/50 transition-colors">
                 <div className="w-12 h-12 bg-indigo-500/10 rounded-xl flex items-center justify-center mb-6 border border-indigo-500/20">
                   <BrainCircuit className="w-6 h-6 text-indigo-400" />
                 </div>
@@ -375,9 +375,9 @@ function LandingPage({ onStart, onShowAuth, user }: { onStart: () => void, onSho
                 <p className="text-zinc-400 leading-relaxed text-sm">
                   We go beyond outdated keyword stuffing. The engine extracts LSI keywords and NLP entities from live SERP data, weaving them naturally into your document's architecture to build true topical authority.
                 </p>
-              </div>
+              </article>
 
-              <div className="bg-zinc-900/30 border border-white/5 p-8 rounded-2xl hover:bg-zinc-900/50 transition-colors">
+              <article className="bg-zinc-900/30 border border-white/5 p-8 rounded-2xl hover:bg-zinc-900/50 transition-colors">
                 <div className="w-12 h-12 bg-emerald-500/10 rounded-xl flex items-center justify-center mb-6 border border-emerald-500/20">
                   <TrendingUp className="w-6 h-6 text-emerald-400" />
                 </div>
@@ -385,9 +385,9 @@ function LandingPage({ onStart, onShowAuth, user }: { onStart: () => void, onSho
                 <p className="text-zinc-400 leading-relaxed text-sm">
                   Whether the query is informational, transactional, or commercial, our structural variation algorithms adapt the content hierarchy to give users exactly what they are searching for, reducing bounce rates.
                 </p>
-              </div>
+              </article>
 
-              <div className="bg-zinc-900/30 border border-white/5 p-8 rounded-2xl hover:bg-zinc-900/50 transition-colors">
+              <article className="bg-zinc-900/30 border border-white/5 p-8 rounded-2xl hover:bg-zinc-900/50 transition-colors">
                 <div className="w-12 h-12 bg-rose-500/10 rounded-xl flex items-center justify-center mb-6 border border-rose-500/20">
                   <Fingerprint className="w-6 h-6 text-rose-400" />
                 </div>
@@ -395,14 +395,14 @@ function LandingPage({ onStart, onShowAuth, user }: { onStart: () => void, onSho
                 <p className="text-zinc-400 leading-relaxed text-sm">
                   Protect your site from algorithmic penalties. We utilize structural unpredictability, burstiness in sentence length, and E-E-A-T++ trust signals to create content that reads like a seasoned industry expert.
                 </p>
-              </div>
+              </article>
             </div>
           </div>
 
           <div>
             <h4 className="text-lg font-bold text-emerald-400 mb-6 flex items-center gap-2 justify-center"><FileEdit className="w-5 h-5" /> For Optimizing Existing Content</h4>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="bg-zinc-900/30 border border-white/5 p-8 rounded-2xl hover:bg-zinc-900/50 transition-colors">
+              <article className="bg-zinc-900/30 border border-white/5 p-8 rounded-2xl hover:bg-zinc-900/50 transition-colors">
                 <div className="w-12 h-12 bg-purple-500/10 rounded-xl flex items-center justify-center mb-6 border border-purple-500/20">
                   <ScanSearch className="w-6 h-6 text-purple-400" />
                 </div>
@@ -410,9 +410,9 @@ function LandingPage({ onStart, onShowAuth, user }: { onStart: () => void, onSho
                 <p className="text-zinc-400 leading-relaxed text-sm">
                   Identify missing entities, LSI keywords, and conceptual clusters that top-ranking competitors cover, ensuring your article achieves complete topical authority.
                 </p>
-              </div>
+              </article>
 
-              <div className="bg-zinc-900/30 border border-white/5 p-8 rounded-2xl hover:bg-zinc-900/50 transition-colors">
+              <article className="bg-zinc-900/30 border border-white/5 p-8 rounded-2xl hover:bg-zinc-900/50 transition-colors">
                 <div className="w-12 h-12 bg-amber-500/10 rounded-xl flex items-center justify-center mb-6 border border-amber-500/20">
                   <ShieldCheck className="w-6 h-6 text-amber-400" />
                 </div>
@@ -420,22 +420,22 @@ function LandingPage({ onStart, onShowAuth, user }: { onStart: () => void, onSho
                 <p className="text-zinc-400 leading-relaxed text-sm">
                   Evaluate your content for experience, expertise, authoritativeness, and trustworthiness signals, providing actionable recommendations to build credibility.
                 </p>
-              </div>
+              </article>
 
-              <div className="bg-zinc-900/30 border border-white/5 p-8 rounded-2xl hover:bg-zinc-900/50 transition-colors">
+              <article className="bg-zinc-900/30 border border-white/5 p-8 rounded-2xl hover:bg-zinc-900/50 transition-colors">
                 <div className="w-12 h-12 bg-cyan-500/10 rounded-xl flex items-center justify-center mb-6 border border-cyan-500/20">
                   <Target className="w-6 h-6 text-cyan-400" />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-3">AI Overview Readiness</h3>
                 <p className="text-zinc-400 leading-relaxed text-sm">
-                  Restructure paragraphs and headings to capture Featured Snippets and SGE (AI Overviews) with concise, extractable answer blocks and logical formatting.
+                  Restructure paragraphs and headings to capture Featured Snippets and SGE (Search Generative Experience) with concise, extractable answer blocks and logical formatting.
                 </p>
-              </div>
+              </article>
             </div>
           </div>
         </div>
       </div>
-      </div>
+      </section>
 
       {/* How It Works Section */}
       <div id="how-it-works" className="py-24 bg-[#080810]">
