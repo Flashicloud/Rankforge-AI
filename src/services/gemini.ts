@@ -145,8 +145,10 @@ async function runPhase(
   `;
 
   // Determine OpenRouter model based on the requested model
-  // Using Claude Sonnet 4.6 as requested
-  let orModel = "anthropic/claude-4.6-sonnet"; 
+  let orModel = "anthropic/claude-4.5-haiku"; // Fast, cheap model for planning phases
+  if (model.includes("Sonnet")) {
+    orModel = "anthropic/claude-4.6-sonnet"; // Expensive, smart model for heavy lifting
+  }
 
   const response = await getAI().chat.completions.create({
     model: orModel,
@@ -181,37 +183,37 @@ export async function generateSEOContent(
       combinedContext += `\n\nBRAND VOICE & TONE:\n${brandVoice}\nCRITICAL: The entire article MUST be written strictly in this brand voice and tone.`;
     }
 
-    // Phase 0: Structural Variation (gemini-3-flash-preview)
+    // Phase 0: Structural Variation
     if (includePhase0) {
-      const p0 = await runPhase(0, "Structural Variation", "gemini-3-flash-preview", accumulatedContext, keyword, contentType, wordRange, combinedContext, onProgress, onScrapeComplete);
+      const p0 = await runPhase(0, "Structural Variation", "Claude 4.5 Haiku", accumulatedContext, keyword, contentType, wordRange, combinedContext, onProgress, onScrapeComplete);
       accumulatedContext += p0;
     } else {
       if (onProgress) onProgress("Skipping Phase 0: Structural Variation...");
       accumulatedContext += "\n\n## PHASE 0 OUTPUT\n(Skipped by user preference)";
     }
 
-    // Phase 1: SERP Intelligence (gemini-3-pro-preview)
-    const p1 = await runPhase(1, "SERP Intelligence", "gemini-3-pro-preview", accumulatedContext, keyword, contentType, wordRange, combinedContext, onProgress, onScrapeComplete);
+    // Phase 1: SERP Intelligence
+    const p1 = await runPhase(1, "SERP Intelligence", "Claude 4.6 Sonnet", accumulatedContext, keyword, contentType, wordRange, combinedContext, onProgress, onScrapeComplete);
     accumulatedContext += p1;
 
-    // Phase 2: Intent Enforcement (gemini-3-flash-preview)
-    const p2 = await runPhase(2, "Intent Enforcement", "gemini-3-flash-preview", accumulatedContext, keyword, contentType, wordRange, combinedContext, onProgress, onScrapeComplete);
+    // Phase 2: Intent Enforcement
+    const p2 = await runPhase(2, "Intent Enforcement", "Claude 4.5 Haiku", accumulatedContext, keyword, contentType, wordRange, combinedContext, onProgress, onScrapeComplete);
     accumulatedContext += p2;
 
-    // Phase 3: Semantic Architecture (gemini-3-flash-preview)
-    const p3 = await runPhase(3, "Semantic Architecture", "gemini-3-flash-preview", accumulatedContext, keyword, contentType, wordRange, combinedContext, onProgress, onScrapeComplete);
+    // Phase 3: Semantic Architecture
+    const p3 = await runPhase(3, "Semantic Architecture", "Claude 4.5 Haiku", accumulatedContext, keyword, contentType, wordRange, combinedContext, onProgress, onScrapeComplete);
     accumulatedContext += p3;
 
-    // Phase 4: E-E-A-T++ Framework (gemini-3-flash-preview)
-    const p4 = await runPhase(4, "E-E-A-T++ Framework", "gemini-3-flash-preview", accumulatedContext, keyword, contentType, wordRange, combinedContext, onProgress, onScrapeComplete);
+    // Phase 4: E-E-A-T++ Framework
+    const p4 = await runPhase(4, "E-E-A-T++ Framework", "Claude 4.5 Haiku", accumulatedContext, keyword, contentType, wordRange, combinedContext, onProgress, onScrapeComplete);
     accumulatedContext += p4;
 
-    // Phase 5: Content Creation (gemini-3.1-pro-preview)
-    const p5 = await runPhase(5, "Content Creation", "gemini-3.1-pro-preview", accumulatedContext, keyword, contentType, wordRange, combinedContext, onProgress, onScrapeComplete);
+    // Phase 5: Content Creation
+    const p5 = await runPhase(5, "Content Creation", "Claude 4.6 Sonnet", accumulatedContext, keyword, contentType, wordRange, combinedContext, onProgress, onScrapeComplete);
     accumulatedContext += p5;
 
-    // Phase 6: AI Visibility Check (gemini-3-flash-preview)
-    const p6 = await runPhase(6, "AI Visibility Check", "gemini-3-flash-preview", accumulatedContext, keyword, contentType, wordRange, combinedContext, onProgress, onScrapeComplete);
+    // Phase 6: AI Visibility Check
+    const p6 = await runPhase(6, "AI Visibility Check", "Claude 4.5 Haiku", accumulatedContext, keyword, contentType, wordRange, combinedContext, onProgress, onScrapeComplete);
     accumulatedContext += p6;
 
     return accumulatedContext;
