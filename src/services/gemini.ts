@@ -145,11 +145,10 @@ async function runPhase(
   `;
 
   // Determine OpenRouter model based on the requested model
-  // Using valid OpenRouter API IDs to prevent 400 errors. 
-  // OpenRouter has not yet added support for 4.5/4.6 API strings.
+  // Using valid OpenRouter API IDs
   let orModel = "anthropic/claude-haiku-4.5"; 
   if (model.toLowerCase().includes("sonnet")) {
-    orModel = "anthropic/claude-3.5-sonnet"; 
+    orModel = "anthropic/claude-sonnet-4.6"; 
   }
 
   try {
@@ -271,7 +270,7 @@ export async function optimizeSEOContent(
 
     try {
       const responseStream = await getAI().chat.completions.create({
-        model: "anthropic/claude-3.5-sonnet", // Valid ID
+        model: "anthropic/claude-sonnet-4.6", // Updated exact ID
         messages: [{ role: "user", content: prompt }],
         temperature: 0.7,
         max_tokens: 8000,
@@ -317,7 +316,7 @@ export async function optimizeSEOContent(
       if (onProgress) onProgress("Network stream interrupted. Resuming optimization in background (this may take a minute)...");
       
       const response = await getAI().chat.completions.create({
-        model: "anthropic/claude-3.5-sonnet", // Valid ID
+        model: "anthropic/claude-sonnet-4.6", // Updated exact ID
         messages: [{ role: "user", content: prompt }],
         temperature: 0.7,
         max_tokens: 8000,
