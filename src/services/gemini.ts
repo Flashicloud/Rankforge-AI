@@ -145,23 +145,30 @@ async function runPhase(
   `;
 
   // Determine OpenRouter model based on the requested model
-  let orModel = "anthropic/claude-4.5-haiku"; // Fast, cheap model for planning phases
-  if (model.includes("Sonnet")) {
-    orModel = "anthropic/claude-4.6-sonnet"; // Expensive, smart model for heavy lifting
+  // Restoring user specifically requested models from OpenRouter
+  let orModel = "anthropic/claude-4.5-haiku"; 
+  if (model.toLowerCase().includes("sonnet")) {
+    orModel = "anthropic/claude-4.6-sonnet"; 
   }
 
-  const response = await getAI().chat.completions.create({
-    model: orModel,
-    messages: [{ role: "user", content: prompt }],
-    temperature: 0.7,
-  });
+  try {
+    const response = await getAI().chat.completions.create({
+      model: orModel,
+      messages: [{ role: "user", content: prompt }],
+      temperature: 0.7,
+      max_tokens: 8000,
+    });
 
-  const output = `\n\n## PHASE ${phaseId} OUTPUT\n${response.choices[0].message.content}`;
-  
-  // Send the output immediately to the UI
-  if (onProgress) onProgress(`Completed Phase ${phaseId}: ${phaseName}`, output);
-  
-  return output;
+    const output = `\n\n## PHASE ${phaseId} OUTPUT\n${response.choices[0].message.content}`;
+    
+    // Send the output immediately to the UI
+    if (onProgress) onProgress(`Completed Phase ${phaseId}: ${phaseName}`, output);
+    
+    return output;
+  } catch (error: any) {
+    console.error(`Error in Phase ${phaseId}:`, error);
+    throw new Error(`OpenRouter API Error in Phase ${phaseId}: ${error.message || "Unknown error"}`);
+  }
 }
 
 export async function generateSEOContent(
@@ -263,9 +270,10 @@ export async function optimizeSEOContent(
 
     try {
       const responseStream = await getAI().chat.completions.create({
-        model: "anthropic/claude-4.6-sonnet",
+        model: "anthropic/claude-4.6-sonnet", // Restored model
         messages: [{ role: "user", content: prompt }],
         temperature: 0.7,
+        max_tokens: 8000,
         stream: true,
       });
 
@@ -308,9 +316,10 @@ export async function optimizeSEOContent(
       if (onProgress) onProgress("Network stream interrupted. Resuming optimization in background (this may take a minute)...");
       
       const response = await getAI().chat.completions.create({
-        model: "anthropic/claude-4.6-sonnet",
+        model: "anthropic/claude-4.6-sonnet", // Restored model
         messages: [{ role: "user", content: prompt }],
         temperature: 0.7,
+        max_tokens: 8000,
       });
       fullText = response.choices[0].message.content || "";
     }
