@@ -394,26 +394,57 @@ PHASE 4: E-E-A-T++ Trust Framework
 Plan content to explicitly demonstrate: 
 
 Expertise: deep, accurate explanations 
-Experience: real-world examples, workflows, or case insights 
+Experience: specific not generic signals only.
+- Wrong: "In real-world applications, this approach works well"
+- Right: "When you're debugging this at 2am, the error message is misleading — the actual problem is usually X"
+Specificity = human signal. Vagueness = AI signal. 
 Authoritativeness: credible citations and industry references
 Trustworthiness: Transparency and disclaimers where applicable Fact-checked claims Specify where and how these signals appear.
 Signals must feel integrated, not checklist-driven or templated.
+External linking rules:
+  - Link only to primary sources: Google docs, research papers, official documentation
+  - No linking to direct competitors
+  - Every statistic or claim must have a source or be explicitly marked as observation/experience
 
 PHASE 5: Content Creation (Competitive Advantage Mode)  
 
+Voice & Tone Calibration:
+  - Write as one expert talking to another — not a teacher explaining to a student
+  - Use occasional one-sentence paragraphs for emphasis
+  - Allow one or two mild opinion statements ("Most guides get this wrong...")
+  - First-person is allowed sparingly ("In practice, I've seen...")
+  - Imperfect sentence structures are fine — humans don't write in perfect parallel
+
+Intro & Conclusion rules:
+  - Intro must NOT start with "In this article..." or restate the title
+  - Intro should open with a tension, a surprising fact, or a direct problem statement — hook within first 2 sentences
+  - No dedicated "Conclusion" heading — end the article with a forward-looking practical insight or a decision-making statement
+
+Output language: English (US). 
+Avoid British spellings (colour → color, optimise → optimize).
+
 Write an original Unique Value, human-first article that:
-• Should be better than top competitors
-• Exceeds average competitor length by 15–25% only when value-adding (never pad for length).
+
+• Should be better than top competitors.
+• Word count rule:
+  - Exceed competitor length by 15-25% only when every extra section earns its place
+  - Run a mental check after every H2: does this section earn its length?
+  - If a section can be said in 80 words, do not write 200
+  - Padding is a ranking penalty signal in 2026, not a ranking boost
 • Covers semantic entities naturally based on intent (avoid entity saturation or keyword stuffing).
 • Uses clean H2/H3 hierarchy aligned strictly with dominant search intent.
 • Introduces original insights, frameworks, checklists, examples, or practical analysis not found in competitors.
 • Include contextual micro-experience signals where appropriate (real-world observations, usage scenarios, or practical implications) to make explanations feel experience-driven rather than purely descriptive.
 • Improves UX with tables, bullet lists, numbered steps, and strong scannability.
+• Visual suggestions:
+  - Suggest at least 2 places where a custom diagram, table, or screenshot would replace 200 words of explanation
+  - Mark these as [VISUAL SUGGESTION: description]
 • Remains genuinely helpful even without SEO considerations.
 
 AI Overview & Featured Snippet Optimization:
 
-• Where snippet extraction is strategically beneficial, Begin every major H2 section with a concise 40–60 word direct-answer paragraph.
+• Section rhythm must vary deliberately. Some sections open mid-story. Some open with a counter-intuitive claim. Some open with a data point or a real scenario. Only 2-3 sections per article should use direct-answer openers, and only where genuinely needed for snippets.
+• Where snippet extraction is strategically beneficial, format that specific section for extractability and clarity.
 • The first sentence under each H2 must clearly answer the section topic in standalone form.
 • For “What is” queries, use definition-style formatting.
 • For process-based intent, use numbered steps.
@@ -442,8 +473,36 @@ PAA Integration Enforcement:
 Quality & Authenticity Safeguard:
 
 • Avoid mimicking competitor structure or phrasing.
+• Heading style rules:
+  - Avoid generic headings like "What is X", "Benefits of X", "Introduction to X"
+  - Headings should create curiosity or signal specific value
+  - Wrong: "Benefits of Internal Linking"
+  - Right: "Why Google Ignores Pages With No Internal Links"
 • Do not mirror heading patterns mechanically.
 • Prioritize clarity, depth, and real explanatory value over optimization signals.
+
+Forbidden AI patterns — never use these:
+- "In today's fast-paced world..."
+- "It is important to note that..."
+- "This comprehensive guide will..."
+- Consecutive sentences starting with "This", "These", "It"
+- Ending sections with "In summary" or "In conclusion"
+- Using "delve", "leverage", "robust", "crucial", "comprehensive"
+- Symmetric paragraph lengths across sections
+- Lists where prose would be more natural
+
+Sentence variety enforcement:
+- Mix short (5-8 word) sentences with long ones
+- No more than 3 consecutive sentences of similar length
+- Vary sentence starts: not every sentence subject-verb order
+- Transitional phrases should vary — not always "However", 
+  "Additionally", "Furthermore"
+
+Final human pass instruction:
+After generating the article, identify 3 places where a human expert 
+would naturally say something slightly unexpected, opinionated, or 
+based on hard-won experience — and insert those moments. These are 
+the sentences AI detectors and Google's HCS system cannot fake.
 
 Output Format: Markdown.
 
