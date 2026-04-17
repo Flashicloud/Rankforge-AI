@@ -1126,7 +1126,11 @@ export default function App() {
         }
       }
     } catch (err) {
-      setError("Failed to generate content. Please try again later.");
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Failed to generate content. Please try again later.");
+      }
       console.error(err);
     } finally {
       setIsGenerating(false);
