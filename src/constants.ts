@@ -531,7 +531,6 @@ AI Extraction Readiness
 Citation Check:
 - Every factual claim has a source or observation tag
 - No heading follows generic "What is X" pattern
-- Visual suggestions marked at minimum 2 places
 
 Internal Linking Strategy 
 - Suggest 3–5 contextual internal linking anchor opportunities. 
