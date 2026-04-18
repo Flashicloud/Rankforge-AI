@@ -404,7 +404,7 @@ Signals must feel integrated, not checklist-driven or templated.
 External linking rules:
   - Link only to primary sources: Google docs, research papers, official documentation
   - No linking to direct competitors
-  - Every statistic or claim must have a source or be explicitly marked as observation/experience
+  - Every statistic or claim MUST have an inline source citation or be explicitly marked as [OBSERVATION] or [EXPERIENCE-BASED]. No exceptions.
 
 PHASE 5: Content Creation (Competitive Advantage Mode)  
 
@@ -478,6 +478,8 @@ Quality & Authenticity Safeguard:
   - Headings should create curiosity or signal specific value
   - Wrong: "Benefits of Internal Linking"
   - Right: "Why Google Ignores Pages With No Internal Links"
+• Before finalizing headings, review every H2 and H3 
+  - if any heading starts with "What is", "Why is", "How to", replace it with a specific value-driven alternative.
 • Do not mirror heading patterns mechanically.
 • Prioritize clarity, depth, and real explanatory value over optimization signals.
 
@@ -525,6 +527,11 @@ AI Extraction Readiness
 - Lists and steps are formatted cleanly for snippet eligibility. Topical Depth Confirmation 
 - Core subtopics are covered with sufficient explanatory depth. 
 - No section feels padded or surface-level. 
+
+Citation Check:
+- Every factual claim has a source or observation tag
+- No heading follows generic "What is X" pattern
+- Visual suggestions marked at minimum 2 places
 
 Internal Linking Strategy 
 - Suggest 3–5 contextual internal linking anchor opportunities. 

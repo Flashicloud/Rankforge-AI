@@ -912,8 +912,14 @@ export default function App() {
               className={`rounded-2xl border ${phase.border} bg-white/5 backdrop-blur-xl overflow-hidden shadow-2xl transition-all duration-300`}
             >
               <div 
-                onClick={() => togglePhase(phaseId)}
-                className={`px-6 py-4 border-b ${phase.border} bg-black/40 flex items-center justify-between cursor-pointer hover:bg-black/60 transition-colors`}
+                onClick={() => {
+                  if (userPlan === 'free') {
+                    setShowUpgradeModal(true);
+                    return;
+                  }
+                  togglePhase(phaseId);
+                }}
+                className={`px-6 py-4 border-b ${phase.border} bg-black/40 flex items-center justify-between transition-colors ${userPlan === 'free' ? 'cursor-pointer hover:bg-black/60 opacity-90' : 'cursor-pointer hover:bg-black/60'}`}
               >
                 <div className="flex items-center gap-3">
                   <div className={`p-1.5 rounded-lg bg-white/10 ${phase.color}`}>
@@ -925,7 +931,7 @@ export default function App() {
                 </div>
                 <div className="flex items-center gap-4">
                   {/* Copy Button for Phase 5 */}
-                  {phaseId === 5 && (
+                  {phaseId === 5 && userPlan !== 'free' && (
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -948,7 +954,14 @@ export default function App() {
                     <span className="text-[10px] font-mono text-zinc-500 uppercase">Completed</span>
                     <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
                   </div>
-                  {isExpanded ? <ChevronUp className="w-4 h-4 text-zinc-500" /> : <ChevronDown className="w-4 h-4 text-zinc-500" />}
+                  {userPlan === 'free' ? (
+                    <div className="flex items-center gap-1.5 bg-amber-500/10 px-2.5 py-1 rounded-md border border-amber-500/20">
+                      <Lock className="w-3 h-3 text-amber-500" />
+                      <span className="text-[10px] text-amber-500 font-bold uppercase tracking-wider">Pro</span>
+                    </div>
+                  ) : (
+                    isExpanded ? <ChevronUp className="w-4 h-4 text-zinc-500" /> : <ChevronDown className="w-4 h-4 text-zinc-500" />
+                  )}
                 </div>
               </div>
               
@@ -1019,11 +1032,14 @@ export default function App() {
               ...prev,
               [phaseId]: partialOutput
             }));
-            // Auto-expand the new phase
-            setExpandedPhases(prev => ({
-              ...prev,
-              [phaseId]: true
-            }));
+            
+            // Auto-expand the new phase only if the user is a pro user
+            if (userPlan !== 'free') {
+              setExpandedPhases(prev => ({
+                ...prev,
+                [phaseId]: true
+              }));
+            }
           }
         }, includePhase0, (stats) => setScrapeStats(stats));
         
