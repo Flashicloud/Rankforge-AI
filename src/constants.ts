@@ -528,9 +528,6 @@ AI Extraction Readiness
 - Core subtopics are covered with sufficient explanatory depth. 
 - No section feels padded or surface-level. 
 
-Citation Check:
-- Every factual claim has a source or observation tag
-- No heading follows generic "What is X" pattern
 
 Internal Linking Strategy 
 - Suggest 3–5 contextual internal linking anchor opportunities. 
@@ -542,6 +539,10 @@ Clarity & Compression Review
 
 Confirm that entity usage density feels natural when read aloud and does not appear mechanically optimized. 
 Only finalize output after all checks are satisfied. 
+
+Citation Check:
+- Every factual claim has a source or observation tag
+- No heading follows generic "What is X" pattern
 
 FINAL OUTPUT (IN THIS ORDER) 
 

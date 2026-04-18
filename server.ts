@@ -2,6 +2,7 @@ import express from 'express';
 import path from 'path';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
+import Stripe from 'stripe';
 
 async function startServer() {
   const app = express();
@@ -10,6 +11,90 @@ async function startServer() {
   app.use(express.json());
 
   // API Routes
+  app.post('/api/create-checkout-session', async (req, res) => {
+    try {
+      const { planId, userId } = req.body;
+      const stripeKey = process.env.STRIPE_SECRET_KEY;
+      
+      if (!stripeKey) {
+        return res.status(500).json({ error: 'STRIPE_SECRET_KEY is missing' });
+      }
+
+      if (!userId) {
+        return res.status(400).json({ error: 'userId is required' });
+      }
+
+      const stripe = new Stripe(stripeKey);
+
+      let priceInCents = 0;
+      let productName = '';
+      
+      if (planId === 'starter') {
+        priceInCents = 1500; // $15.00
+        productName = 'Starter Plan (20 Credits)';
+      } else if (planId === 'pro') {
+        priceInCents = 2900; // $29.00
+        productName = 'Pro Plan (50 Credits)';
+      } else {
+        return res.status(400).json({ error: 'Invalid plan selected' });
+      }
+
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items: [
+          {
+            price_data: {
+              currency: 'usd',
+              product_data: {
+                name: productName,
+              },
+              unit_amount: priceInCents,
+            },
+            quantity: 1,
+          },
+        ],
+        mode: 'payment',
+        // In AI Studio, the frontend usually runs on the same domain
+        // Use req.headers.origin or a relative path? Let's use the origin from headers.
+        success_url: `${req.headers.origin}?payment=success&session_id={CHECKOUT_SESSION_ID}&plan=${planId}`,
+        cancel_url: `${req.headers.origin}?payment=cancelled`,
+        client_reference_id: userId,
+        metadata: {
+          planId,
+          userId,
+        }
+      });
+
+      res.json({ id: session.id, url: session.url });
+    } catch (e) {
+      console.error('[Stripe] Checkout Error:', e);
+      res.status(500).json({ error: 'Failed to create checkout session' });
+    }
+  });
+
+  app.post('/api/verify-checkout-session', async (req, res) => {
+    try {
+      const { sessionId } = req.body;
+      const stripeKey = process.env.STRIPE_SECRET_KEY;
+      
+      if (!stripeKey || !sessionId) {
+        return res.status(400).json({ valid: false });
+      }
+
+      const stripe = new Stripe(stripeKey);
+      const session = await stripe.checkout.sessions.retrieve(sessionId);
+
+      if (session.payment_status === 'paid') {
+         res.json({ valid: true, planId: session.metadata?.planId, userId: session.metadata?.userId });
+      } else {
+         res.json({ valid: false });
+      }
+    } catch (e) {
+      console.error('[Stripe] Verify Error:', e);
+      res.status(500).json({ valid: false });
+    }
+  });
+
   app.post('/api/scrape-serp', async (req, res) => {
     const { keyword } = req.body;
     if (!keyword) {

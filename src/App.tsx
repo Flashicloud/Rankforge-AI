@@ -87,7 +87,7 @@ const CustomSelect = ({ value, onChange, options, placeholder, disabled }: { val
   );
 };
 
-function LandingPage({ onStart, onShowAuth, user }: { onStart: () => void, onShowAuth: () => void, user: User | null }) {
+function LandingPage({ onStart, onShowAuth, onUpgrade, user }: { onStart: () => void, onShowAuth: () => void, onUpgrade: () => void, user: User | null }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeLegalPage, setActiveLegalPage] = useState<'privacy' | 'terms' | 'cookie' | 'contact' | null>(null);
 
@@ -623,7 +623,7 @@ function LandingPage({ onStart, onShowAuth, user }: { onStart: () => void, onSho
                 ))}
               </ul>
               <button
-                onClick={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); user ? onStart() : onShowAuth(); }}
+                onClick={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); user ? onUpgrade() : onShowAuth(); }}
                 className="w-full py-3 rounded-xl font-semibold text-sm text-zinc-300 hover:text-white bg-white/[0.05] hover:bg-white/10 border border-white/[0.08] hover:border-white/20 transition-all"
               >
                 Choose Starter
@@ -880,6 +880,72 @@ export default function App() {
   const [userCredits, setUserCredits] = useState<number>(0);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [currentDocId, setCurrentDocId] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Check URL for session_id to verify payment
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionId = urlParams.get('session_id');
+    const paymentStatus = urlParams.get('payment');
+    
+    if (sessionId && paymentStatus === 'success' && user) {
+      const verifyPayment = async () => {
+        try {
+          // Tell the user we are verifying
+          setStatusMessage('Verifying payment...');
+          const res = await fetch('/api/verify-checkout-session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sessionId })
+          });
+          
+          const data = await res.json();
+          
+          if (data.valid) {
+            // Give credits based on plan
+            let creditsToAdd = 0;
+            if (data.planId === 'starter') creditsToAdd = 20;
+            if (data.planId === 'pro') creditsToAdd = 50;
+            
+            if (creditsToAdd > 0) {
+              const userRef = doc(db, 'users', user.uid);
+              // Read current credits
+              const userSnap = await getDoc(userRef);
+              let newCredits = creditsToAdd;
+              if (userSnap.exists()) {
+                const currentData = userSnap.data();
+                newCredits = (currentData.credits || 0) + creditsToAdd;
+                await updateDoc(userRef, {
+                  credits: newCredits,
+                  plan: data.planId
+                });
+              } else {
+                 await setDoc(userRef, {
+                  email: user.email,
+                  plan: data.planId,
+                  credits: newCredits,
+                  createdAt: new Date().toISOString()
+                });
+              }
+              setUserPlan(data.planId);
+              setUserCredits(newCredits);
+              alert('Payment successful! Your credits have been updated.');
+            }
+          }
+          // Clean up URL
+          window.history.replaceState({}, document.title, window.location.pathname);
+        } catch (e) {
+          console.error("Payment verification failed", e);
+        } finally {
+          setStatusMessage('');
+        }
+      };
+      
+      verifyPayment();
+    } else if (paymentStatus === 'cancelled') {
+        alert('Payment was cancelled.');
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, [user]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -1322,11 +1388,40 @@ export default function App() {
         {showUpgradeModal && (
           <PricingModal 
             onClose={() => setShowUpgradeModal(false)} 
-            onSelectPlan={(plan) => {
-              // Usually connects to Stripe here
-              console.log(`Selected plan: ${plan}`);
-              alert(`Mock: Redirecting to Stripe for ${plan} plan checkout. \n\n(In production, this would open Stripe Checkout)`);
-              setShowUpgradeModal(false);
+            onSelectPlan={async (plan) => {
+              if (!user) {
+                setShowUpgradeModal(false);
+                setShowAuthModal(true);
+                return;
+              }
+              
+              try {
+                setStatusMessage('Connecting to Stripe...');
+                const res = await fetch('/api/create-checkout-session', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ planId: plan, userId: user.uid })
+                });
+                
+                const data = await res.json();
+                
+                if (data.url) {
+                  // Fallback for iframe environments (AI Studio) where Stripe blocks framing
+                  if (window !== window.top) {
+                    window.open(data.url, '_blank');
+                    setStatusMessage('Please complete payment in the new tab.');
+                  } else {
+                    window.location.href = data.url;
+                  }
+                } else if (data.error) {
+                  alert(`Payment Error: ${data.error}. \n\nDid you add your STRIPE_SECRET_KEY to the environment variables?`);
+                }
+              } catch (e) {
+                console.error("Failed to connect to wait", e);
+                alert("Failed to connect to Stripe server.");
+              } finally {
+                setStatusMessage('');
+              }
             }} 
           />
         )}
@@ -1334,6 +1429,15 @@ export default function App() {
 
       <main className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 z-10">
         
+        {/* Top Verifying Status */}
+        {statusMessage === 'Verifying payment...' && (
+          <div className="fixed top-0 left-0 right-0 z-50 bg-indigo-500/10 border-b border-indigo-500/20 backdrop-blur-xl p-3 flex justify-center">
+            <div className="flex items-center gap-2 text-indigo-400 font-medium text-sm">
+              <Loader2 className="w-4 h-4 animate-spin" /> Verifying your payment and assigning credits...
+            </div>
+          </div>
+        )}
+
         {view === 'dashboard' ? (
           <Suspense fallback={<div className="flex items-center justify-center min-h-[50vh]"><Loader2 className="w-8 h-8 text-indigo-500 animate-spin" /></div>}>
             <Dashboard onViewArticle={async (article) => {
@@ -2048,51 +2152,6 @@ export default function App() {
         </>
         )}
       </main>
-
-      {/* Upgrade Modal */}
-      {showUpgradeModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-[#111118] border border-white/10 rounded-2xl p-8 max-w-md w-full relative shadow-2xl"
-          >
-            <button 
-              onClick={() => setShowUpgradeModal(false)}
-              className="absolute top-4 right-4 text-zinc-500 hover:text-white transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-            <div className="w-12 h-12 rounded-full bg-indigo-500/10 flex items-center justify-center mb-6">
-              <Lock className="w-6 h-6 text-indigo-400" />
-            </div>
-            <h3 className="text-2xl font-bold text-white mb-3">Premium Feature</h3>
-            <p className="text-zinc-400 mb-8 leading-relaxed">
-              This feature is only available on Starter and Pro plans. Upgrade your account to unlock advanced research data and content optimization tools.
-            </p>
-            <div className="flex gap-3">
-              <button 
-                onClick={() => setShowUpgradeModal(false)}
-                className="flex-1 py-3 rounded-xl font-bold text-sm text-zinc-300 hover:text-white bg-white/5 hover:bg-white/10 transition-colors"
-              >
-                Maybe Later
-              </button>
-              <button 
-                onClick={() => {
-                  setShowUpgradeModal(false);
-                  setView('landing');
-                  setTimeout(() => {
-                    document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' });
-                  }, 100);
-                }}
-                className="flex-1 py-3 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 shadow-lg shadow-indigo-500/25 transition-all"
-              >
-                View Plans
-              </button>
-            </div>
-          </motion.div>
-        </div>
-      )}
     </div>
   );
 }
