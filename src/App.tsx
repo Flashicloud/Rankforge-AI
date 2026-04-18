@@ -14,7 +14,8 @@ import DOMPurify from 'dompurify';
 import TurndownService from 'turndown';
 import { auth, db, logOut } from './services/firebase';
 import { onAuthStateChanged, User } from 'firebase/auth';
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, addDoc, doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+import { PricingModal } from './components/PricingModal';
 
 const Dashboard = lazy(() => import('./components/Dashboard'));
 const AuthModal = lazy(() => import('./components/AuthModal'));
@@ -554,7 +555,7 @@ function LandingPage({ onStart, onShowAuth, user }: { onStart: () => void, onSho
             <div className="bg-[#111118] border border-white/[0.07] rounded-3xl p-7 hover:border-white/20 transition-all duration-300 flex flex-col group">
               <div className="mb-6">
                 <div className="text-xs font-bold uppercase tracking-widest text-zinc-500 mb-3">Free</div>
-                <h3 className="text-4xl font-black text-white">$0<span className="text-xl font-medium text-zinc-500 ml-1">/mo</span></h3>
+                <h3 className="text-4xl font-black text-white">$0<span className="text-xl font-medium text-zinc-500 ml-1"></span></h3>
                 <p className="text-zinc-500 text-sm mt-2">Test the waters and see the quality.</p>
               </div>
               <div className="h-px bg-white/[0.06] mb-6"></div>
@@ -563,7 +564,7 @@ function LandingPage({ onStart, onShowAuth, user }: { onStart: () => void, onSho
                   <div className="w-5 h-5 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center flex-shrink-0">
                     <Check className="w-3 h-3 text-emerald-400" />
                   </div>
-                  <span><strong className="text-zinc-200">1</strong> Article per month</span>
+                  <span><strong className="text-zinc-200">2</strong> Free Credits</span>
                 </li>
                 <li className="flex items-center gap-3 text-zinc-400 text-sm">
                   <div className="w-5 h-5 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center flex-shrink-0">
@@ -598,60 +599,26 @@ function LandingPage({ onStart, onShowAuth, user }: { onStart: () => void, onSho
               </button>
             </div>
 
-            {/* Starter Plan — Most Popular */}
-            <div className="relative rounded-3xl p-[1px] flex-col" style={{background: 'linear-gradient(135deg, #6366f1, #a855f7, #6366f1)'}}>
-              <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10">
-                <div className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-[10px] font-black uppercase tracking-widest py-1 px-4 rounded-full shadow-lg shadow-indigo-500/30">
-                  Most Popular
-                </div>
-              </div>
-              <div className="bg-[#13131f] rounded-[calc(1.5rem-1px)] p-7 flex flex-col h-full">
-                <div className="mb-6">
-                  <div className="text-xs font-bold uppercase tracking-widest text-indigo-400 mb-3">Starter</div>
-                  <h3 className="text-4xl font-black text-white">$9<span className="text-xl font-medium text-zinc-500 ml-1">/mo</span></h3>
-                  <p className="text-zinc-400 text-sm mt-2">Perfect for bloggers and small sites.</p>
-                </div>
-                <div className="h-px bg-white/10 mb-6"></div>
-                <ul className="space-y-3.5 mb-8 flex-1">
-                  {['10 Articles per month', 'Content Optimization Tool', 'Research & Strategy Data', 'Auto-Save to Dashboard'].map((item, i) => (
-                    <li key={i} className="flex items-center gap-3 text-zinc-300 text-sm">
-                      <div className="w-5 h-5 rounded-full bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center flex-shrink-0">
-                        <Check className="w-3 h-3 text-indigo-400" />
-                      </div>
-                      <span dangerouslySetInnerHTML={{__html: i === 0 ? '<strong class="text-white">10</strong> Articles per month' : item}} />
-                    </li>
-                  ))}
-                </ul>
-                <button
-                  onClick={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); user ? onStart() : onShowAuth(); }}
-                  className="w-full py-3 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 shadow-lg shadow-indigo-500/20 transition-all hover:shadow-indigo-500/40"
-                >
-                  Start Free Trial
-                </button>
-              </div>
-            </div>
-
-            {/* Pro Plan */}
+            {/* Starter Plan */}
             <div className="bg-[#111118] border border-white/[0.07] rounded-3xl p-7 hover:border-white/20 transition-all duration-300 flex flex-col group">
               <div className="mb-6">
-                <div className="text-xs font-bold uppercase tracking-widest text-zinc-500 mb-3">Pro</div>
-                <h3 className="text-4xl font-black text-white">$29<span className="text-xl font-medium text-zinc-500 ml-1">/mo</span></h3>
-                <p className="text-zinc-500 text-sm mt-2">For serious marketers and niche sites.</p>
+                <div className="text-xs font-bold uppercase tracking-widest text-indigo-400 mb-3">Starter</div>
+                <h3 className="text-4xl font-black text-white">$15<span className="text-xl font-medium text-zinc-500 ml-1">/mo</span></h3>
+                <p className="text-zinc-400 text-sm mt-2">Perfect for bloggers and small sites.</p>
               </div>
-              <div className="h-px bg-white/[0.06] mb-6"></div>
+              <div className="h-px bg-white/10 mb-6"></div>
               <ul className="space-y-3.5 mb-8 flex-1">
                 {[
-                  { label: '<strong class="text-zinc-200">50</strong> Articles per month', ok: true },
-                  { label: '<strong class="text-zinc-200">Surfer-Level NLP Pipeline</strong>', ok: true },
-                  { label: 'Custom Brand Voice', ok: true },
-                  { label: 'API Access', ok: true },
-                  { label: '24/7 Dedicated Support', ok: true },
+                  '<strong class="text-white">20</strong> Credits per month',
+                  'Content Optimization Tool',
+                  'Research & Strategy Data',
+                  'Auto-Save to Dashboard'
                 ].map((item, i) => (
-                  <li key={i} className="flex items-center gap-3 text-zinc-400 text-sm">
-                    <div className="w-5 h-5 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center flex-shrink-0">
-                      <Check className="w-3 h-3 text-emerald-400" />
+                  <li key={i} className="flex items-center gap-3 text-zinc-300 text-sm">
+                    <div className="w-5 h-5 rounded-full bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center flex-shrink-0">
+                      <Check className="w-3 h-3 text-indigo-400" />
                     </div>
-                    <span dangerouslySetInnerHTML={{__html: item.label}} />
+                    <span dangerouslySetInnerHTML={{__html: item}} />
                   </li>
                 ))}
               </ul>
@@ -659,9 +626,54 @@ function LandingPage({ onStart, onShowAuth, user }: { onStart: () => void, onSho
                 onClick={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); user ? onStart() : onShowAuth(); }}
                 className="w-full py-3 rounded-xl font-semibold text-sm text-zinc-300 hover:text-white bg-white/[0.05] hover:bg-white/10 border border-white/[0.08] hover:border-white/20 transition-all"
               >
+                Choose Starter
+              </button>
+            </div>
+
+            {/* Pro Plan — Most Popular */}
+            <div className="relative rounded-3xl p-[1px] flex-col" style={{background: 'linear-gradient(135deg, #6366f1, #a855f7, #6366f1)'}}>
+              <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10">
+                <div className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-[10px] font-black uppercase tracking-widest py-1 px-4 rounded-full shadow-lg shadow-indigo-500/30">
+                  Most Popular
+                </div>
+              </div>
+              <div className="bg-[#13131f] rounded-[calc(1.5rem-1px)] p-7 flex flex-col h-full">
+              <div className="mb-6">
+                <div className="text-xs font-bold uppercase tracking-widest text-purple-400 mb-3">Pro</div>
+                <h3 className="text-4xl font-black text-white">$29<span className="text-xl font-medium text-zinc-500 ml-1">/mo</span></h3>
+                <p className="text-zinc-300 text-sm mt-2">For serious marketers and niche sites.</p>
+              </div>
+              <div className="h-px bg-white/[0.06] mb-6"></div>
+              <ul className="space-y-3.5 mb-8 flex-1">
+                {[
+                  { label: '<strong class="text-white">50</strong> Credits per month', ok: true },
+                  { label: '<strong class="text-white">Surfer-Level NLP Pipeline</strong>', ok: true },
+                  { label: 'Custom Brand Voice', ok: true },
+                  { label: 'API Access', ok: true },
+                  { label: '24/7 Dedicated Support', ok: true },
+                ].map((item, i) => (
+                  <li key={i} className="flex items-center gap-3 text-zinc-300 text-sm">
+                    <div className="w-5 h-5 rounded-full bg-purple-500/15 border border-purple-500/30 flex items-center justify-center flex-shrink-0">
+                      <Check className="w-3 h-3 text-purple-400" />
+                    </div>
+                    <span dangerouslySetInnerHTML={{__html: item.label}} />
+                  </li>
+                ))}
+              </ul>
+              <button
+                onClick={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); user ? onStart() : onShowAuth(); }}
+                className="w-full py-3 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 shadow-lg shadow-indigo-500/20 transition-all hover:shadow-indigo-500/40"
+              >
                 Get Pro Access
               </button>
             </div>
+            </div>
+          </div>
+
+          <div className="text-center mt-12 text-zinc-500 text-sm flex items-center justify-center gap-2">
+            <span className="w-12 h-px bg-white/10"></span>
+            <strong>Note:</strong> 1 Credit = 1 Generated or Optimized Article.
+            <span className="w-12 h-px bg-white/10"></span>
           </div>
         </div>
       </div>
@@ -864,11 +876,38 @@ export default function App() {
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [scrapeStats, setScrapeStats] = useState<{ success: number; failed: number; total: number } | null>(null);
-  const [userPlan, setUserPlan] = useState<'free' | 'starter' | 'pro'>('free');
+  const [userPlan, setUserPlan] = useState<'free' | 'starter' | 'pro' | 'agency'>('free');
+  const [userCredits, setUserCredits] = useState<number>(0);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [currentDocId, setCurrentDocId] = useState<string | null>(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      if (currentUser) {
+        // Fetch or create user document
+        const userRef = doc(db, 'users', currentUser.uid);
+        const userSnap = await getDoc(userRef);
+        
+        if (userSnap.exists()) {
+          const userData = userSnap.data();
+          setUserPlan(userData.plan || 'free');
+          setUserCredits(typeof userData.credits === 'number' ? userData.credits : 0);
+        } else {
+          // Initialize new user with 2 free credits
+          await setDoc(userRef, {
+            email: currentUser.email,
+            plan: 'free',
+            credits: 2,
+            createdAt: new Date().toISOString()
+          });
+          setUserPlan('free');
+          setUserCredits(2);
+        }
+      } else {
+        setUserPlan('free');
+        setUserCredits(0);
+      }
+      
       setUser(currentUser);
       setIsAuthReady(true);
     });
@@ -1007,6 +1046,11 @@ export default function App() {
     e.preventDefault();
     if (!keyword.trim()) return;
 
+    if (userPlan === 'free' && userCredits <= 0) {
+      setShowUpgradeModal(true);
+      return;
+    }
+
     setIsGenerating(true);
     setError(null);
     setContent(null);
@@ -1124,10 +1168,10 @@ export default function App() {
         setActiveTab('article');
       }
 
-      // Auto-save to dashboard
+      // Auto-save to dashboard and update credits
       if (user && finalContent && finalContent !== "No content generated. Please try again.") {
         try {
-          await addDoc(collection(db, `users/${user.uid}/articles`), {
+          const docRef = await addDoc(collection(db, `users/${user.uid}/articles`), {
             userId: user.uid,
             keyword,
             content: finalContent,
@@ -1135,8 +1179,18 @@ export default function App() {
             mode,
             createdAt: new Date().toISOString()
           });
+          setCurrentDocId(docRef.id);
           setSaveSuccess(true);
           setTimeout(() => setSaveSuccess(false), 3000);
+
+          // Deduct credit if user is on free plan
+          if (userPlan === 'free' && userCredits > 0) {
+            const userRef = doc(db, 'users', user.uid);
+            await updateDoc(userRef, {
+              credits: userCredits - 1
+            });
+            setUserCredits(prev => prev - 1);
+          }
         } catch (err) {
           console.error("Auto-save failed:", err);
         }
@@ -1219,6 +1273,16 @@ export default function App() {
             {isAuthReady && (
               user ? (
                 <div className="flex items-center gap-2">
+                  {userPlan === 'free' && (
+                    <button 
+                      onClick={() => setShowUpgradeModal(true)}
+                      className="hidden sm:flex text-white text-xs font-medium px-3 py-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 items-center gap-2 hover:bg-amber-500/20 transition-all mr-2"
+                    >
+                      <span className="font-bold text-amber-500">{userCredits}</span>
+                      <span className="text-zinc-400">Credits Remaining</span>
+                      <span className="bg-amber-500 text-black px-1.5 py-0.5 rounded text-[10px] uppercase font-bold ml-1 tracking-wider">Upgrade</span>
+                    </button>
+                  )}
                   <button
                     onClick={() => setView(view === 'dashboard' ? 'app' : 'dashboard')}
                     className="text-xs font-semibold text-white transition-all px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 shadow-lg shadow-indigo-500/20 flex items-center gap-2"
@@ -1254,6 +1318,20 @@ export default function App() {
         </Suspense>
       )}
 
+      <AnimatePresence>
+        {showUpgradeModal && (
+          <PricingModal 
+            onClose={() => setShowUpgradeModal(false)} 
+            onSelectPlan={(plan) => {
+              // Usually connects to Stripe here
+              console.log(`Selected plan: ${plan}`);
+              alert(`Mock: Redirecting to Stripe for ${plan} plan checkout. \n\n(In production, this would open Stripe Checkout)`);
+              setShowUpgradeModal(false);
+            }} 
+          />
+        )}
+      </AnimatePresence>
+
       <main className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 z-10">
         
         {view === 'dashboard' ? (
@@ -1264,6 +1342,7 @@ export default function App() {
               setContent(article.content);
               setSeoScore(article.seoScore || null);
               setPhaseOutputs({});
+              setCurrentDocId(article.id);
               
               const { article: finalArticleText } = extractArticleAndResearch(article.content, article.mode);
               
@@ -1280,7 +1359,7 @@ export default function App() {
           <div className="flex justify-center mb-10">
             <div className="flex bg-[#0e0e1a] p-1.5 rounded-2xl border border-white/[0.07] shadow-xl">
               <button
-                onClick={() => { setMode('generate'); setContent(null); setError(null); }}
+                onClick={() => { setMode('generate'); setContent(null); setError(null); setCurrentDocId(null); setEditableContent(''); setKeyword(''); setExistingArticle(''); }}
                 className={`flex items-center gap-2.5 px-7 py-3 rounded-xl text-sm font-bold transition-all duration-200 ${mode === 'generate' ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/25' : 'text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.05]'}`}
               >
                 <Brain className="w-4 h-4" /> Generate New Article
@@ -1290,7 +1369,7 @@ export default function App() {
                   if (userPlan === 'free') {
                     setShowUpgradeModal(true);
                   } else {
-                    setMode('optimize'); setContent(null); setError(null); 
+                    setMode('optimize'); setContent(null); setError(null); setCurrentDocId(null); setEditableContent(''); setKeyword(''); setExistingArticle('');
                   }
                 }}
                 className={`flex items-center gap-2.5 px-7 py-3 rounded-xl text-sm font-bold transition-all duration-200 ${mode === 'optimize' ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/25' : 'text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.05]'}`}
@@ -1638,15 +1717,73 @@ export default function App() {
                       setIsSaving(true);
                       try {
                         const turndownService = new TurndownService();
-                        const markdownToSave = editableContent ? turndownService.turndown(editableContent) : content;
-                        await addDoc(collection(db, `users/${user.uid}/articles`), {
-                          userId: user.uid,
-                          keyword,
-                          content: markdownToSave,
-                          seoScore: seoScore || null,
-                          mode,
-                          createdAt: new Date().toISOString()
-                        });
+                        const modifiedArticleMarkdown = editableContent ? turndownService.turndown(editableContent) : null;
+                        
+                        let markdownToSave = content || '';
+                        
+                        // Re-stitch the modified article back into the full text to keep research data and headers
+                        if (modifiedArticleMarkdown && content) {
+                          if (mode === 'generate') {
+                            const p5Marker = '## PHASE 5 OUTPUT';
+                            const p6Marker = '## PHASE 6 OUTPUT';
+                            const p5Index = content.indexOf(p5Marker);
+                            if (p5Index !== -1) {
+                              const startOfArticle = content.indexOf('\n', p5Index);
+                              const p6Index = content.indexOf(p6Marker, startOfArticle);
+                              
+                              if (p6Index !== -1) {
+                                const beforeArticle = content.substring(0, startOfArticle);
+                                const afterArticle = content.substring(p6Index);
+                                markdownToSave = beforeArticle + '\n\n' + modifiedArticleMarkdown + '\n\n' + afterArticle;
+                              } else {
+                                const beforeArticle = content.substring(0, startOfArticle);
+                                markdownToSave = beforeArticle + '\n\n' + modifiedArticleMarkdown;
+                              }
+                            } else {
+                              markdownToSave = modifiedArticleMarkdown;
+                            }
+                          } else {
+                            const p7Marker = '## PHASE 7 OUTPUT';
+                            const p8Marker = '## PHASE 8 OUTPUT';
+                            const p7Index = content.indexOf(p7Marker);
+                            
+                            if (p7Index !== -1) {
+                              const startOfArticle = content.indexOf('\n', p7Index);
+                              const p8Index = content.indexOf(p8Marker, startOfArticle);
+                              
+                              if (p8Index !== -1) {
+                                const beforeArticle = content.substring(0, startOfArticle);
+                                const afterArticle = content.substring(p8Index);
+                                markdownToSave = beforeArticle + '\n\n' + modifiedArticleMarkdown + '\n\n' + afterArticle;
+                              } else {
+                                const beforeArticle = content.substring(0, startOfArticle);
+                                markdownToSave = beforeArticle + '\n\n' + modifiedArticleMarkdown;
+                              }
+                            } else {
+                              markdownToSave = modifiedArticleMarkdown;
+                            }
+                          }
+                        } else if (!content && modifiedArticleMarkdown) {
+                           markdownToSave = modifiedArticleMarkdown;
+                        }
+
+                        if (currentDocId) {
+                          await updateDoc(doc(db, `users/${user.uid}/articles`, currentDocId), {
+                            content: markdownToSave,
+                            seoScore: seoScore || null,
+                            updatedAt: new Date().toISOString()
+                          });
+                        } else {
+                          const docRef = await addDoc(collection(db, `users/${user.uid}/articles`), {
+                            userId: user.uid,
+                            keyword,
+                            content: markdownToSave,
+                            seoScore: seoScore || null,
+                            mode,
+                            createdAt: new Date().toISOString()
+                          });
+                          setCurrentDocId(docRef.id);
+                        }
                         setSaveSuccess(true);
                         setTimeout(() => setSaveSuccess(false), 3000);
                       } catch (err) {

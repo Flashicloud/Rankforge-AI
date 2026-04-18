@@ -45,6 +45,12 @@ service cloud.firestore {
              );
     }
 
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['credits']) && request.resource.data.credits is number;
+    }
+
     match /users/{userId}/articles/{articleId} {
       allow read: if isOwner(userId);
       allow create: if isOwner(userId) && isValidArticle(userId);
