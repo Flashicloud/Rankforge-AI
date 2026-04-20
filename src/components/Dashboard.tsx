@@ -77,7 +77,15 @@ export default function Dashboard({ onViewArticle }: { onViewArticle: (article: 
     
     const { article: finalArticleContent } = extractArticleAndResearch(article.content, article.mode || 'generate');
     
-    const htmlContent = await marked.parse(finalArticleContent);
+    let htmlContent = await marked.parse(finalArticleContent, { async: false, gfm: true });
+    
+    // Add inline styles to tables so they copy over perfectly to Word and PDF
+    if (typeof htmlContent === 'string') {
+      htmlContent = htmlContent.replace(/<table/g, '<table border="1" style="border-collapse: collapse; width: 100%; border: 1px solid #ddd; margin-bottom: 1em; text-align: left;"');
+      htmlContent = htmlContent.replace(/<th/g, '<th style="border: 1px solid #ddd; padding: 12px 8px; background-color: #f8f9fa; font-weight: bold;"');
+      htmlContent = htmlContent.replace(/<td/g, '<td style="border: 1px solid #ddd; padding: 8px;"');
+    }
+
     const styledHtml = `
       <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 20px;">
         <h1 style="color: #111; border-bottom: 1px solid #eee; padding-bottom: 10px;">${article.keyword}</h1>

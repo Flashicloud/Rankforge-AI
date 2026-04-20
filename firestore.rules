@@ -45,10 +45,15 @@ service cloud.firestore {
              );
     }
 
+    function isSuperAdmin() {
+      return isAuthenticated() && request.auth.token.email == 'kaleemullah838@gmail.com';
+    }
+
     match /users/{userId} {
-      allow read: if isOwner(userId);
+      allow read: if isOwner(userId) || isSuperAdmin();
       allow create: if isOwner(userId);
-      allow update: if isOwner(userId) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['credits']) && request.resource.data.credits is number;
+      allow update: if isOwner(userId) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['credits']) && request.resource.data.credits is number || isSuperAdmin();
+      allow list: if isSuperAdmin();
     }
 
     match /users/{userId}/articles/{articleId} {

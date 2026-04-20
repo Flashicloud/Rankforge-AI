@@ -19,6 +19,7 @@ import { PricingModal } from './components/PricingModal';
 
 const Dashboard = lazy(() => import('./components/Dashboard'));
 const AuthModal = lazy(() => import('./components/AuthModal'));
+const AdminPanel = lazy(() => import('./components/AdminPanel'));
 const JoditEditor = lazy(() => import('jodit-react'));
 
 // Lazy load recharts components
@@ -842,7 +843,7 @@ function LandingPage({ onStart, onShowAuth, onUpgrade, user }: { onStart: () => 
 import { extractArticleAndResearch } from './utils/textUtils';
 
 export default function App() {
-  const [view, setView] = useState<'landing' | 'app' | 'dashboard'>('landing');
+  const [view, setView] = useState<'landing' | 'app' | 'dashboard' | 'admin'>('landing');
   const [user, setUser] = useState<User | null>(null);
   const [isAuthReady, setIsAuthReady] = useState(false);
   const [mode, setMode] = useState<'generate' | 'optimize'>('generate');
@@ -972,8 +973,23 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (isAuthReady && !user && view !== 'landing') {
-      setView('landing');
+    if (isAuthReady) {
+       // Secret Admin Route
+       if (window.location.pathname === '/admin-secret-manager') {
+         if (user && user.email === 'kaleemullah838@gmail.com') {
+           setView('admin');
+         } else if (user) {
+           alert("Unauthorized Access");
+           setView('app');
+         } else {
+           setShowAuthModal(true);
+         }
+         return;
+       }
+
+      if (!user && view !== 'landing') {
+        setView('landing');
+      }
     }
   }, [user, isAuthReady, view]);
 
@@ -1177,8 +1193,14 @@ export default function App() {
         setContent(finalContent);
         
         // Convert Markdown to HTML for the Rich Text Editor
-        const html = await marked.parse(article);
-        const cleanHtml = DOMPurify.sanitize(html);
+        const html = await marked.parse(article, { async: false, gfm: true });
+        let cleanHtml = DOMPurify.sanitize(html);
+        
+        // Add inline styles to tables so they copy over perfectly to WordPress/Word
+        cleanHtml = cleanHtml.replace(/<table/g, '<table border="1" style="border-collapse: collapse; width: 100%; border: 1px solid #ddd; margin-bottom: 1em;"');
+        cleanHtml = cleanHtml.replace(/<th/g, '<th style="border: 1px solid #ddd; padding: 12px 8px; background-color: #f8f9fa; text-align: left; font-weight: bold;"');
+        cleanHtml = cleanHtml.replace(/<td/g, '<td style="border: 1px solid #ddd; padding: 8px;"');
+        
         setEditableContent(cleanHtml);
         setActiveTab('article');
       } else {
@@ -1219,8 +1241,14 @@ export default function App() {
         setContent(finalContent);
         
         // Convert Markdown to HTML for the Rich Text Editor
-        const html = await marked.parse(article);
-        const cleanHtml = DOMPurify.sanitize(html);
+        const html = await marked.parse(article, { async: false, gfm: true });
+        let cleanHtml = DOMPurify.sanitize(html);
+        
+        // Add inline styles to tables so they copy over perfectly to WordPress/Word
+        cleanHtml = cleanHtml.replace(/<table/g, '<table border="1" style="border-collapse: collapse; width: 100%; border: 1px solid #ddd; margin-bottom: 1em;"');
+        cleanHtml = cleanHtml.replace(/<th/g, '<th style="border: 1px solid #ddd; padding: 12px 8px; background-color: #f8f9fa; text-align: left; font-weight: bold;"');
+        cleanHtml = cleanHtml.replace(/<td/g, '<td style="border: 1px solid #ddd; padding: 8px;"');
+        
         setEditableContent(cleanHtml);
         setActiveTab('article');
       }
@@ -1429,7 +1457,14 @@ export default function App() {
           </div>
         )}
 
-        {view === 'dashboard' ? (
+        {view === 'admin' ? (
+          <Suspense fallback={<div className="flex items-center justify-center min-h-[50vh]"><Loader2 className="w-8 h-8 text-indigo-500 animate-spin" /></div>}>
+            <AdminPanel onBack={() => {
+              window.history.replaceState({}, document.title, '/');
+              setView('app');
+            }} />
+          </Suspense>
+        ) : view === 'dashboard' ? (
           <Suspense fallback={<div className="flex items-center justify-center min-h-[50vh]"><Loader2 className="w-8 h-8 text-indigo-500 animate-spin" /></div>}>
             <Dashboard onViewArticle={async (article) => {
               setKeyword(article.keyword);
@@ -1441,8 +1476,14 @@ export default function App() {
               
               const { article: finalArticleText } = extractArticleAndResearch(article.content, article.mode);
               
-              const html = await marked.parse(finalArticleText);
-              const cleanHtml = DOMPurify.sanitize(html);
+              const html = await marked.parse(finalArticleText, { async: false, gfm: true });
+              let cleanHtml = DOMPurify.sanitize(html);
+              
+              // Add inline styles to tables so they copy over perfectly to WordPress/Word
+              cleanHtml = cleanHtml.replace(/<table/g, '<table border="1" style="border-collapse: collapse; width: 100%; border: 1px solid #ddd; margin-bottom: 1em;"');
+              cleanHtml = cleanHtml.replace(/<th/g, '<th style="border: 1px solid #ddd; padding: 12px 8px; background-color: #f8f9fa; text-align: left; font-weight: bold;"');
+              cleanHtml = cleanHtml.replace(/<td/g, '<td style="border: 1px solid #ddd; padding: 8px;"');
+              
               setEditableContent(cleanHtml);
               setView('app');
             }} />

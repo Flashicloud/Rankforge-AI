@@ -37,14 +37,18 @@ export const extractArticleAndResearch = (fullText: string, currentMode: 'genera
     // Try to strip conversational prefix by finding the first heading mark
     const firstHeadingIndex = article.indexOf('#');
     if (firstHeadingIndex !== -1 && firstHeadingIndex < 500) {
-      // If there's text before the first heading, and it's relatively short, strip it
-      const prefix = article.substring(0, firstHeadingIndex).trim();
-      if (prefix.length > 0 && !prefix.includes('\n\n')) {
-         article = article.substring(firstHeadingIndex).trim();
-      } else if (prefix.toLowerCase().includes('here is') || prefix.toLowerCase().includes('article')) {
-         article = article.substring(firstHeadingIndex).trim();
-      } else {
-         // Aggressively strip if it looks like AI chatter
+      // If there's text before the first heading, check if it's filler
+      const prefix = article.substring(0, firstHeadingIndex).trim().toLowerCase();
+      // Only strip if the prefix is short or explicitly conversational
+      if (
+        prefix.includes('here is the article') || 
+        prefix.includes('here is your article') || 
+        prefix.includes('here is the requested') || 
+        prefix.includes('here is') || 
+        prefix.includes('sure,') || 
+        prefix.includes('certainly') || 
+        (prefix.length > 0 && prefix.length < 150 && !prefix.includes('\n\n')) // Short 1-liner like "Here is the article:"
+      ) {
          article = article.substring(firstHeadingIndex).trim();
       }
     }
