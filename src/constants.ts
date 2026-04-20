@@ -134,6 +134,13 @@ Identify opportunities to improve perceived expertise and authority.
 
 PHASE 6: Optimization Strategy Plan
 
+Heading audit (mandatory):
+- Flag every generic heading like "What is X", 
+  "Benefits of X", "Introduction to X"
+- Suggest specific value-driven alternatives
+- Mark as Critical if heading directly affects 
+  snippet eligibility
+
 Create a prioritized improvement roadmap.
 
 For each recommendation specify exact placement.
@@ -164,6 +171,13 @@ Optional enhancement
 
 PHASE 7: Precision Content Upgrades
 
+Length rule during optimization:
+- Only add content that fills a genuine gap
+- Do not expand sections for length alone
+- If a section is thin but complete, leave it
+- Net word count increase should not exceed 
+  25% of original unless critical gaps exist
+
 Only improve sections that need improvement.
 
 Do NOT rewrite the entire article unless it is structurally unsalvageable.
@@ -176,7 +190,20 @@ Provide:
 - snippet-optimized answer blocks
 - improved explanations
 
+Every new factual claim added MUST have an inline 
+source citation or be marked as [OBSERVATION] 
+or [EXPERIENCE-BASED]. No exceptions.
+
 Focus on clarity, authority, and usefulness.
+
+Forbidden AI patterns in all improved content:
+- "In today's fast-paced world..."
+- "It is important to note that..."
+- Using "delve", "leverage", "robust", "crucial"
+- Consecutive sentences starting with 
+  "This", "These", "It"
+- Symmetric paragraph lengths
+- Lists where prose would be more natural
 
 ---
 
@@ -212,7 +239,10 @@ FINAL OUTPUT (IN THIS ORDER)
 
 8. Final SEO upgrade validation checklist
 
-9. Overall SEO Score (Must be exactly in this JSON format at the very end:
+9. Meta description:
+    - Version 1: 150-160 characters, keyword-first, benefit-driven
+
+10. Overall SEO Score (Must be exactly in this JSON format at the very end:
 \`\`\`json
 {
   "seo_score": 85,
@@ -546,12 +576,21 @@ Citation Check:
 
 FINAL OUTPUT (IN THIS ORDER) 
 
-SERP & competitor analysis summary 
-Search intent classification + justification 
-Semantic keyword & entity map 
-E-E-A-T++ implementation plan 
-Fully written article 
+SERP & competitor analysis summary
+Search intent classification + justification
+Semantic keyword & entity map
+E-E-A-T++ implementation plan
+Fully written article
 Pre-publish SEO & intent validation checklist
+Meta description (mandatory):
+- Write exactly 2 versions
+- Version 1: 150-160 characters, keyword-first, 
+  benefit-driven
+- Version 2: 150-160 characters, curiosity/question 
+  angle
+- No clickbait, no keyword stuffing
+- Must read naturally as a human would write it
+- Include primary keyword within first 60 characters
 Overall SEO Score (Must be exactly in this JSON format at the very end:
 \`\`\`json
 {
