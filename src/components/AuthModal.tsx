@@ -53,10 +53,23 @@ export default function AuthModal({ onClose }: { onClose: () => void }) {
 
   const handleGoogle = async () => {
     try {
+      setLoading(true);
+      setError('');
       await signInWithGoogle();
       onClose();
-    } catch (err) {
-      setError('Google sign in failed. Please try again.');
+    } catch (err: any) {
+      console.error(err);
+      if (err.message?.includes('unauthorized domain') || err.code === 'auth/unauthorized-domain') {
+        setError('Domain not authorized. Please add this app URL to Firebase Authorized Domains.');
+      } else if (err.code === 'auth/popup-closed-by-user') {
+        setError('Google sign in was cancelled.');
+      } else if (err.code === 'auth/popup-blocked') {
+        setError('Login popup blocked by your browser. Please allow popups or open the app in a new tab.');
+      } else {
+        setError(err?.message || 'Google sign in failed. Please try again.');
+      }
+    } finally {
+      setLoading(false);
     }
   };
 

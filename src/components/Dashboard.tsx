@@ -7,7 +7,7 @@ import html2pdf from 'html2pdf.js';
 import { saveAs } from 'file-saver';
 import { marked } from 'marked';
 import WordPressExportModal from './WordPressExportModal';
-import { extractArticleAndResearch } from '../App';
+import { extractArticleAndResearch } from '../utils/textUtils';
 
 interface Article {
   id: string;

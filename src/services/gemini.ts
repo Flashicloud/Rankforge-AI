@@ -142,6 +142,7 @@ async function runPhase(
     DO NOT execute any other phases.
     Focus strictly on the requirements for Phase ${phaseId} as defined in the system prompt.
     Output ONLY the result for Phase ${phaseId}.
+    ${phaseId === 5 ? "CRITICAL: Output ONLY the article text. Start directly with the H1 heading. Do not include introductory phrases like 'Here is the article'. Do not include concluding remarks." : ""}
   `;
 
   // Determine OpenRouter model based on the requested model

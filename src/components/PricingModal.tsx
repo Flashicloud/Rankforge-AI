@@ -14,12 +14,12 @@ export function PricingModal({ onClose, onSelectPlan }: PricingModalProps) {
       name: 'Starter',
       price: '$15',
       credits: 20,
-      description: 'Perfect for testing and small projects.',
+      description: 'Perfect for bloggers and small sites.',
       features: [
-        '20 Premium Articles',
-        'Claude 3.7 Sonnet for Writing',
-        'SERP Scrape & E-E-A-T Audit',
-        'Standard Support'
+        '<strong>20</strong> Credits per month',
+        'Content Optimization Tool',
+        'Research & Strategy Data',
+        'Auto-Save to Dashboard'
       ]
     },
     {
@@ -27,14 +27,14 @@ export function PricingModal({ onClose, onSelectPlan }: PricingModalProps) {
       name: 'Pro',
       price: '$29',
       credits: 50,
-      description: 'For regular content creators.',
+      description: 'For serious marketers and niche sites.',
       popular: true,
       features: [
-        '50 Premium Articles',
-        'Claude 3.7 Sonnet for Writing',
-        'SERP Scrape & E-E-A-T Audit',
-        'Priority Support',
-        'Optimization Mode'
+        '<strong>50</strong> Credits per month',
+        '<strong>Surfer-Level NLP Pipeline</strong>',
+        'Custom Brand Voice',
+        'API Access',
+        '24/7 Dedicated Support'
       ]
     }
   ];
@@ -78,16 +78,13 @@ export function PricingModal({ onClose, onSelectPlan }: PricingModalProps) {
                   <span className="text-4xl font-bold">{plan.price}</span>
                   <span className="text-zinc-500">/mo</span>
                 </div>
-                <div className="text-sm font-medium text-emerald-400 bg-emerald-400/10 inline-block px-3 py-1 rounded-full border border-emerald-400/20">
-                  {plan.credits} Credits included
-                </div>
               </div>
 
               <div className="space-y-4 mb-8 flex-1">
                 {plan.features.map((feature, i) => (
                   <div key={i} className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-indigo-400 shrink-0" />
-                    <span className="text-sm text-zinc-300">{feature}</span>
+                    <span className="text-sm text-zinc-300" dangerouslySetInnerHTML={{ __html: feature }} />
                   </div>
                 ))}
               </div>

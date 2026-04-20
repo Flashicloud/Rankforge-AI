@@ -608,19 +608,30 @@ function LandingPage({ onStart, onShowAuth, onUpgrade, user }: { onStart: () => 
               </div>
               <div className="h-px bg-white/10 mb-6"></div>
               <ul className="space-y-3.5 mb-8 flex-1">
-                {[
-                  '<strong class="text-white">20</strong> Credits per month',
-                  'Content Optimization Tool',
-                  'Research & Strategy Data',
-                  'Auto-Save to Dashboard'
-                ].map((item, i) => (
-                  <li key={i} className="flex items-center gap-3 text-zinc-300 text-sm">
-                    <div className="w-5 h-5 rounded-full bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center flex-shrink-0">
-                      <Check className="w-3 h-3 text-indigo-400" />
-                    </div>
-                    <span dangerouslySetInnerHTML={{__html: item}} />
-                  </li>
-                ))}
+                <li className="flex items-center gap-3 text-zinc-300 text-sm">
+                  <div className="w-5 h-5 rounded-full bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center flex-shrink-0">
+                    <Check className="w-3 h-3 text-indigo-400" />
+                  </div>
+                  <span><strong className="text-white">20</strong> Credits per month</span>
+                </li>
+                <li className="flex items-center gap-3 text-zinc-300 text-sm">
+                  <div className="w-5 h-5 rounded-full bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center flex-shrink-0">
+                    <Check className="w-3 h-3 text-indigo-400" />
+                  </div>
+                  <span>Content Optimization Tool</span>
+                </li>
+                <li className="flex items-center gap-3 text-zinc-300 text-sm">
+                  <div className="w-5 h-5 rounded-full bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center flex-shrink-0">
+                    <Check className="w-3 h-3 text-indigo-400" />
+                  </div>
+                  <span>Research & Strategy Data</span>
+                </li>
+                <li className="flex items-center gap-3 text-zinc-300 text-sm">
+                  <div className="w-5 h-5 rounded-full bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center flex-shrink-0">
+                    <Check className="w-3 h-3 text-indigo-400" />
+                  </div>
+                  <span>Auto-Save to Dashboard</span>
+                </li>
               </ul>
               <button
                 onClick={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); user ? onUpgrade() : onShowAuth(); }}
@@ -645,20 +656,36 @@ function LandingPage({ onStart, onShowAuth, onUpgrade, user }: { onStart: () => 
               </div>
               <div className="h-px bg-white/[0.06] mb-6"></div>
               <ul className="space-y-3.5 mb-8 flex-1">
-                {[
-                  { label: '<strong class="text-white">50</strong> Credits per month', ok: true },
-                  { label: '<strong class="text-white">Surfer-Level NLP Pipeline</strong>', ok: true },
-                  { label: 'Custom Brand Voice', ok: true },
-                  { label: 'API Access', ok: true },
-                  { label: '24/7 Dedicated Support', ok: true },
-                ].map((item, i) => (
-                  <li key={i} className="flex items-center gap-3 text-zinc-300 text-sm">
-                    <div className="w-5 h-5 rounded-full bg-purple-500/15 border border-purple-500/30 flex items-center justify-center flex-shrink-0">
-                      <Check className="w-3 h-3 text-purple-400" />
-                    </div>
-                    <span dangerouslySetInnerHTML={{__html: item.label}} />
-                  </li>
-                ))}
+                <li className="flex items-center gap-3 text-zinc-300 text-sm">
+                  <div className="w-5 h-5 rounded-full bg-purple-500/15 border border-purple-500/30 flex items-center justify-center flex-shrink-0">
+                    <Check className="w-3 h-3 text-purple-400" />
+                  </div>
+                  <span><strong className="text-white">50</strong> Credits per month</span>
+                </li>
+                <li className="flex items-center gap-3 text-zinc-300 text-sm">
+                  <div className="w-5 h-5 rounded-full bg-purple-500/15 border border-purple-500/30 flex items-center justify-center flex-shrink-0">
+                    <Check className="w-3 h-3 text-purple-400" />
+                  </div>
+                  <span><strong className="text-white">Surfer-Level NLP Pipeline</strong></span>
+                </li>
+                <li className="flex items-center gap-3 text-zinc-300 text-sm">
+                  <div className="w-5 h-5 rounded-full bg-purple-500/15 border border-purple-500/30 flex items-center justify-center flex-shrink-0">
+                    <Check className="w-3 h-3 text-purple-400" />
+                  </div>
+                  <span>Custom Brand Voice</span>
+                </li>
+                <li className="flex items-center gap-3 text-zinc-300 text-sm">
+                  <div className="w-5 h-5 rounded-full bg-purple-500/15 border border-purple-500/30 flex items-center justify-center flex-shrink-0">
+                    <Check className="w-3 h-3 text-purple-400" />
+                  </div>
+                  <span>API Access</span>
+                </li>
+                <li className="flex items-center gap-3 text-zinc-300 text-sm">
+                  <div className="w-5 h-5 rounded-full bg-purple-500/15 border border-purple-500/30 flex items-center justify-center flex-shrink-0">
+                    <Check className="w-3 h-3 text-purple-400" />
+                  </div>
+                  <span>24/7 Dedicated Support</span>
+                </li>
               </ul>
               <button
                 onClick={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); user ? onStart() : onShowAuth(); }}
@@ -812,43 +839,7 @@ function LandingPage({ onStart, onShowAuth, onUpgrade, user }: { onStart: () => 
   );
 }
 
-export const extractArticleAndResearch = (fullText: string, currentMode: 'generate' | 'optimize') => {
-  let research = fullText;
-  let article = fullText;
-
-  if (currentMode === 'generate') {
-    // Try exact match first since runPhase appends exactly "## PHASE X OUTPUT"
-    const p5Marker = '## PHASE 5 OUTPUT';
-    const p6Marker = '## PHASE 6 OUTPUT';
-    
-    const p5Index = fullText.indexOf(p5Marker);
-    if (p5Index !== -1) {
-      const startIdx = fullText.indexOf('\n', p5Index);
-      const p6Index = fullText.indexOf(p6Marker, startIdx);
-      
-      if (p6Index !== -1) {
-        article = fullText.substring(startIdx, p6Index).trim();
-      } else {
-        article = fullText.substring(startIdx).trim();
-      }
-      return { article, research };
-    }
-
-    // Fallback regex if exact marker is missing
-    const phase5Match = fullText.match(/(?:^|\n)[ \t]*(?:## |### |\*\*|__)*[ \t]*(?:PHASE 5|5\.)[^\n]*\n([\s\S]*?)(?:(?:^|\n)[ \t]*(?:## |### |\*\*|__)*[ \t]*(?:PHASE 6|6\.)|$)/i);
-    if (phase5Match) {
-      article = phase5Match[1].trim();
-    }
-  } else {
-    // Optimize mode: Article is usually in Phase 7
-    const phase7Match = fullText.match(/(?:^|\n)[ \t]*(?:## |### |\*\*|__)*[ \t]*(?:PHASE 7|7\.)[^\n]*\n([\s\S]*?)(?:(?:^|\n)[ \t]*(?:## |### |\*\*|__)*[ \t]*(?:PHASE 8|8\.)|$)/i);
-    if (phase7Match) {
-      article = phase7Match[1].trim();
-    }
-  }
-
-  return { article, research };
-};
+import { extractArticleAndResearch } from './utils/textUtils';
 
 export default function App() {
   const [view, setView] = useState<'landing' | 'app' | 'dashboard'>('landing');
@@ -1098,7 +1089,7 @@ export default function App() {
   if (view === 'landing') {
     return (
       <>
-        <LandingPage onStart={() => user ? setView('app') : setShowAuthModal(true)} onShowAuth={() => setShowAuthModal(true)} user={user} />
+        <LandingPage onStart={() => user ? setView('app') : setShowAuthModal(true)} onShowAuth={() => setShowAuthModal(true)} onUpgrade={() => user ? setView('app') : setShowAuthModal(true)} user={user} />
         {showAuthModal && (
           <Suspense fallback={<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80"><Loader2 className="w-8 h-8 text-indigo-500 animate-spin" /></div>}>
             <AuthModal onClose={() => setShowAuthModal(false)} />
@@ -1928,9 +1919,9 @@ export default function App() {
                 </div>
               </div>
               
-              <div className="p-8 md:p-16 relative z-10">
+              <div className="p-8 md:p-16 relative z-10 w-full overflow-hidden bg-[#0a0a0f] pt-0">
                 {seoScore !== null && (
-                  <div className="mb-12 space-y-6">
+                  <div className="mb-12 space-y-6 mt-16">
                     <div className="p-8 bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-8 shadow-2xl relative overflow-hidden">
                       <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 blur-[80px] rounded-full -mr-20 -mt-20 pointer-events-none"></div>
                       <div className="flex-1 w-full relative z-10">
@@ -2095,10 +2086,10 @@ export default function App() {
                   </div>
                 )}
                 
-                <div className="flex items-center gap-3 mb-8 border-b border-white/10 pb-5">
+                <div className="flex items-center gap-2 mt-8 px-2 relative z-20">
                   <button 
                     onClick={() => setActiveTab('article')}
-                    className={`px-6 py-3 rounded-xl font-bold transition-all duration-300 flex items-center gap-2.5 ${activeTab === 'article' ? 'bg-indigo-500 text-white shadow-[0_0_20px_rgba(99,102,241,0.3)]' : 'bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10 border border-white/5 hover:border-white/10 backdrop-blur-sm'}`}
+                    className={`px-6 py-3 font-bold transition-all duration-300 flex items-center gap-2.5 translate-y-[1px] rounded-t-xl border border-b-0 ${activeTab === 'article' ? 'text-indigo-400 bg-[#0a0a0f] border-white/10' : 'text-zinc-500 hover:text-zinc-300 opacity-70 border-transparent hover:bg-white/5'}`}
                   >
                     <PenTool className="w-4 h-4" />
                     Final Article
@@ -2111,7 +2102,7 @@ export default function App() {
                         setActiveTab('research');
                       }
                     }}
-                    className={`px-6 py-3 rounded-xl font-bold transition-all duration-300 flex items-center gap-2.5 ${activeTab === 'research' ? 'bg-indigo-500 text-white shadow-[0_0_20px_rgba(99,102,241,0.3)]' : 'bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10 border border-white/5 hover:border-white/10 backdrop-blur-sm'}`}
+                    className={`px-6 py-3 font-bold transition-all duration-300 flex items-center gap-2.5 translate-y-[1px] rounded-t-xl border border-b-0 ${activeTab === 'research' ? 'text-indigo-400 bg-[#0a0a0f] border-white/10' : 'text-zinc-500 hover:text-zinc-300 opacity-70 border-transparent hover:bg-white/5'}`}
                   >
                     <BrainCircuit className="w-4 h-4" />
                     Research & Strategy
@@ -2119,38 +2110,40 @@ export default function App() {
                   </button>
                 </div>
 
-                {activeTab === 'article' ? (
-                  <div className="bg-white text-black rounded-xl overflow-hidden shadow-sm border border-white/10">
-                    <Suspense fallback={<div className="min-h-[500px] flex items-center justify-center bg-zinc-50"><Loader2 className="w-8 h-8 text-indigo-500 animate-spin" /></div>}>
-                      <JoditEditor
-                        value={editableContent}
-                        config={{
-                          readonly: false,
-                          height: 500,
-                          placeholder: 'Edit your article here...',
-                          theme: 'default',
-                          style: {
-                            fontFamily: 'inherit',
-                            fontSize: '16px'
-                          }
-                        }}
-                        onBlur={(newContent) => setEditableContent(newContent)}
-                        onChange={(newContent) => {}}
-                      />
-                    </Suspense>
-                  </div>
-                ) : (
-                  <div className="w-full">
-                    {renderPhaseCards()}
-                  </div>
-                )}
+                <div className="pt-8 px-2 md:px-4 border-t border-white/10 relative z-10 bg-[#0a0a0f]">
+                  {activeTab === 'article' ? (
+                    <div className="bg-white text-black rounded-xl overflow-hidden shadow-sm border border-white/10">
+                      <Suspense fallback={<div className="min-h-[500px] flex items-center justify-center bg-zinc-50"><Loader2 className="w-8 h-8 text-indigo-500 animate-spin" /></div>}>
+                        <JoditEditor
+                          value={editableContent}
+                          config={{
+                            readonly: false,
+                            height: 500,
+                            placeholder: 'Edit your article here...',
+                            theme: 'default',
+                            style: {
+                              fontFamily: 'inherit',
+                              fontSize: '16px'
+                            }
+                          }}
+                          onBlur={(newContent) => setEditableContent(newContent)}
+                          onChange={(newContent) => {}}
+                        />
+                      </Suspense>
+                    </div>
+                  ) : (
+                    <div className="w-full">
+                      {renderPhaseCards()}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </motion.div>
         )}
-
         </>
         )}
+
       </main>
     </div>
   );
