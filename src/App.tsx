@@ -946,10 +946,13 @@ export default function App() {
         const userRef = doc(db, 'users', currentUser.uid);
         const userSnap = await getDoc(userRef);
         
+        let planToSet: 'free' | 'starter' | 'pro' | 'agency' = 'free';
+        let creditsToSet = 0;
+
         if (userSnap.exists()) {
           const userData = userSnap.data();
-          setUserPlan(userData.plan || 'free');
-          setUserCredits(typeof userData.credits === 'number' ? userData.credits : 0);
+          planToSet = userData.plan || 'free';
+          creditsToSet = typeof userData.credits === 'number' ? userData.credits : 0;
         } else {
           // Initialize new user with 2 free credits
           await setDoc(userRef, {
@@ -958,9 +961,27 @@ export default function App() {
             credits: 2,
             createdAt: new Date().toISOString()
           });
-          setUserPlan('free');
-          setUserCredits(2);
+          planToSet = 'free';
+          creditsToSet = 2;
         }
+
+        // --- SUPER ADMIN OVERRIDE ---
+        if (currentUser.email === 'kaleemullah838@gmail.com') {
+          planToSet = 'agency';
+          creditsToSet = 99999;
+          
+          // Optionally silently update DB so admin sees themselves as agency
+          if (userSnap.exists() && (userSnap.data().plan !== 'agency' || userSnap.data().credits !== 99999)) {
+             await updateDoc(userRef, {
+               plan: 'agency',
+               credits: 99999
+             });
+          }
+        }
+
+        setUserPlan(planToSet);
+        setUserCredits(creditsToSet);
+
       } else {
         setUserPlan('free');
         setUserCredits(0);
