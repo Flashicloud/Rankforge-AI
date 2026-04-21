@@ -264,6 +264,7 @@ async function runOptimizePhase(
     DO NOT execute any other phases.
     Focus strictly on the requirements for Phase ${phaseId} as defined in the system prompt.
     Output ONLY the result for Phase ${phaseId}.
+    ${phaseId < 7 ? "CRITICAL: This is an audit/strategy phase. DO NOT write or rewrite the article content yet. Return ONLY the analysis/audit requested." : ""}
     ${phaseId === 8 ? "CRITICAL: Since this is the final phase, you MUST also output the 'FINAL OUTPUT' items including the Meta description and the exact JSON Overall SEO Score at the very end." : ""}
   `;
 

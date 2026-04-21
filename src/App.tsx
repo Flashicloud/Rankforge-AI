@@ -1063,8 +1063,8 @@ export default function App() {
                   </h3>
                 </div>
                 <div className="flex items-center gap-4">
-                  {/* Copy Button for Phase 5 */}
-                  {phaseId === 5 && userPlan !== 'free' && (
+                  {/* Copy Button */}
+                  {((mode === 'generate' && phaseId === 5) || (mode === 'optimize' && phaseId === 7)) && userPlan !== 'free' && (
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
