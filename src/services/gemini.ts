@@ -232,75 +232,13 @@ export async function generateSEOContent(
   }
 }
 
-async function runOptimizePhase(
-  phaseId: number, 
-  phaseName: string, 
-  model: string, 
-  context: string, 
-  keyword: string,
-  existingArticle: string,
-  contextInjection: string,
-  onProgress?: (status: string, partialOutput?: string) => void
-): Promise<string> {
-  if (onProgress) onProgress(`Executing Phase ${phaseId}: ${phaseName} (${model})...`);
-
-  const prompt = `
-    ${ARTICLE_OPTIMIZATION_PROMPT}
-
-    *** INPUT DATA ***
-    Target Keyword: "${keyword}"
-    ${contextInjection}
-
-    Existing Article:
-    """
-    ${existingArticle}
-    """
-
-    PREVIOUS OUTPUTS:
-    ${context}
-
-    *** IMMEDIATE INSTRUCTION ***
-    ACTION: Execute ONLY PHASE ${phaseId}.
-    DO NOT execute any other phases.
-    Focus strictly on the requirements for Phase ${phaseId} as defined in the system prompt.
-    Output ONLY the result for Phase ${phaseId}.
-    ${phaseId < 7 ? "CRITICAL: This is an audit/strategy phase. DO NOT write or rewrite the article content yet. Return ONLY the analysis/audit requested." : ""}
-    ${phaseId === 8 ? "CRITICAL: Since this is the final phase, you MUST also output the 'FINAL OUTPUT' items including the Meta description and the exact JSON Overall SEO Score at the very end." : ""}
-  `;
-
-  // Determine OpenRouter model based on the requested model
-  let orModel = "anthropic/claude-haiku-4.5"; 
-  if (model.toLowerCase().includes("sonnet")) {
-    orModel = "anthropic/claude-sonnet-4.6"; 
-  }
-
-  try {
-    const response = await getAI().chat.completions.create({
-      model: orModel,
-      messages: [{ role: "user", content: prompt }],
-      temperature: 0.7,
-      max_tokens: 8000,
-    });
-
-    const output = `\n\n## PHASE ${phaseId} OUTPUT\n${response.choices[0].message.content}`;
-    
-    // Send the output immediately to the UI
-    if (onProgress) onProgress(`Completed Phase ${phaseId}: ${phaseName}`, output);
-    
-    return output;
-  } catch (error: any) {
-    console.error(`Error in Phase ${phaseId}:`, error);
-    throw new Error(`OpenRouter API Error in Phase ${phaseId}: ${error.message || "Unknown error"}`);
-  }
-}
-
 export async function optimizeSEOContent(
   keyword: string,
   existingArticle: string,
   contentType: string,
   additionalContext: string,
   brandVoice: string = "",
-  onProgress?: (status: string, partialOutput?: string) => void
+  onProgress?: (status: string) => void
 ) {
   try {
     if (onProgress) onProgress("Initializing Optimization Engine...");
@@ -313,42 +251,82 @@ export async function optimizeSEOContent(
       if (brandVoice.trim()) contextInjection += `BRAND VOICE & TONE: ${brandVoice}\nCRITICAL: The entire article MUST be written strictly in this brand voice and tone.\n`;
     }
 
-    let accumulatedContext = "";
+    const prompt = `
+      ${ARTICLE_OPTIMIZATION_PROMPT}
 
-    // Phase 1: SERP Benchmark
-    const p1 = await runOptimizePhase(1, "SERP Benchmark", "Claude 4.5 Haiku", accumulatedContext, keyword, existingArticle, contextInjection, onProgress);
-    accumulatedContext += p1;
+      *** INPUT DATA ***
+      Target Keyword: "${keyword}"
+      ${contextInjection}
 
-    // Phase 2: Structure Audit
-    const p2 = await runOptimizePhase(2, "Structure Audit", "Claude 4.5 Haiku", accumulatedContext, keyword, existingArticle, contextInjection, onProgress);
-    accumulatedContext += p2;
+      Existing Article:
+      """
+      ${existingArticle}
+      """
+    `;
 
-    // Phase 3: Semantic Gap Analysis
-    const p3 = await runOptimizePhase(3, "Semantic Gap Analysis", "Claude 4.5 Haiku", accumulatedContext, keyword, existingArticle, contextInjection, onProgress);
-    accumulatedContext += p3;
+    if (onProgress) onProgress("Phase 1: SERP Benchmark...");
+    
+    let fullText = "";
+    let currentPhase = 1;
 
-    // Phase 4: AI Overview Readiness
-    const p4 = await runOptimizePhase(4, "AI Overview Readiness", "Claude 4.5 Haiku", accumulatedContext, keyword, existingArticle, contextInjection, onProgress);
-    accumulatedContext += p4;
+    try {
+      const responseStream = await getAI().chat.completions.create({
+        model: "anthropic/claude-sonnet-4.6", // Updated exact ID
+        messages: [{ role: "user", content: prompt }],
+        temperature: 0.7,
+        max_tokens: 8000,
+        stream: true,
+      });
 
-    // Phase 5: E-E-A-T Signal Audit
-    const p5 = await runOptimizePhase(5, "E-E-A-T Signal Audit", "Claude 4.5 Haiku", accumulatedContext, keyword, existingArticle, contextInjection, onProgress);
-    accumulatedContext += p5;
-
-    // Phase 6: Optimization Strategy
-    const p6 = await runOptimizePhase(6, "Optimization Strategy", "Claude 4.6 Sonnet", accumulatedContext, keyword, existingArticle, contextInjection, onProgress);
-    accumulatedContext += p6;
-
-    // Phase 7: Precision Upgrades
-    const p7 = await runOptimizePhase(7, "Precision Upgrades", "Claude 4.6 Sonnet", accumulatedContext, keyword, existingArticle, contextInjection, onProgress);
-    accumulatedContext += p7;
-
-    // Phase 8: SEO Validation & Final Output
-    const p8 = await runOptimizePhase(8, "SEO Validation", "Claude 4.5 Haiku", accumulatedContext, keyword, existingArticle, contextInjection, onProgress);
-    accumulatedContext += p8;
-
-    if (onProgress) onProgress("Optimization Complete!", accumulatedContext);
-    return accumulatedContext;
+      for await (const chunk of responseStream) {
+        try {
+          const text = chunk.choices[0]?.delta?.content || "";
+          if (text) {
+            fullText += text;
+          }
+        } catch (e) {
+          // Ignore chunk text extraction errors
+        }
+        
+        // Real-time phase detection based on AI output
+        if (currentPhase === 1 && (fullText.includes("PHASE 2") || fullText.includes("2. Structure health report") || fullText.includes("Structure Health Report"))) {
+          currentPhase = 2;
+          if (onProgress) onProgress("Phase 2: Structure Audit...");
+        } else if (currentPhase === 2 && (fullText.includes("PHASE 3") || fullText.includes("3. Semantic gap analysis") || fullText.includes("Semantic Coverage"))) {
+          currentPhase = 3;
+          if (onProgress) onProgress("Phase 3: Semantic Gap Analysis...");
+        } else if (currentPhase === 3 && (fullText.includes("PHASE 4") || fullText.includes("4. AI Overview") || fullText.includes("Snippet Readiness"))) {
+          currentPhase = 4;
+          if (onProgress) onProgress("Phase 4: AI Overview Readiness...");
+        } else if (currentPhase === 4 && (fullText.includes("PHASE 5") || fullText.includes("5. E-E-A-T") || fullText.includes("Signal Audit"))) {
+          currentPhase = 5;
+          if (onProgress) onProgress("Phase 5: E-E-A-T Signal Audit...");
+        } else if (currentPhase === 5 && (fullText.includes("PHASE 6") || fullText.includes("6. Optimization roadmap") || fullText.includes("Strategy Plan"))) {
+          currentPhase = 6;
+          if (onProgress) onProgress("Phase 6: Optimization Strategy...");
+        } else if (currentPhase === 6 && (fullText.includes("PHASE 7") || fullText.includes("7. Improved content") || fullText.includes("Precision Content"))) {
+          currentPhase = 7;
+          if (onProgress) onProgress("Phase 7: Precision Upgrades...");
+        } else if (currentPhase === 7 && (fullText.includes("PHASE 8") || fullText.includes("8. Final SEO") || fullText.includes("Visibility Validation"))) {
+          currentPhase = 8;
+          if (onProgress) onProgress("Phase 8: SEO Validation...");
+        }
+      }
+    } catch (streamError) {
+      console.warn("Streaming failed, falling back to standard generation...", streamError);
+      if (onProgress) onProgress("Network stream interrupted. Resuming optimization in background (this may take a minute)...");
+      
+      const response = await getAI().chat.completions.create({
+        model: "anthropic/claude-sonnet-4.6", // Updated exact ID
+        messages: [{ role: "user", content: prompt }],
+        temperature: 0.7,
+        max_tokens: 8000,
+      });
+      fullText = response.choices[0].message.content || "";
+    }
+    
+    if (onProgress) onProgress("Optimization Complete!");
+    return fullText;
   } catch (error) {
     console.error("Error optimizing SEO content:", error);
     if (onProgress) onProgress("Error: Failed to optimize content. Please check your API key and try again.");

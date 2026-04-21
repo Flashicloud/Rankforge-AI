@@ -1063,8 +1063,8 @@ export default function App() {
                   </h3>
                 </div>
                 <div className="flex items-center gap-4">
-                  {/* Copy Button */}
-                  {((mode === 'generate' && phaseId === 5) || (mode === 'optimize' && phaseId === 7)) && userPlan !== 'free' && (
+                  {/* Copy Button for Phase 5 */}
+                  {phaseId === 5 && userPlan !== 'free' && (
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -1225,24 +1225,8 @@ export default function App() {
         setEditableContent(cleanHtml);
         setActiveTab('article');
       } else {
-        const result = await optimizeSEOContent(keyword, existingArticle, contentType, additionalContext, brandVoice, (status, partialOutput) => {
+        const result = await optimizeSEOContent(keyword, existingArticle, contentType, additionalContext, brandVoice, (status) => {
           setStatusMessage(status);
-          const match = status.match(/Phase (\d+)/);
-          if (match && partialOutput) {
-            const phaseId = parseInt(match[1]);
-            setPhaseOutputs(prev => ({
-              ...prev,
-              [phaseId]: partialOutput
-            }));
-            
-            // Auto-expand the new phase only if the user is a pro user
-            if (userPlan !== 'free') {
-              setExpandedPhases(prev => ({
-                ...prev,
-                [phaseId]: true
-              }));
-            }
-          }
         });
         
         finalContent = result || "No content generated. Please try again.";
