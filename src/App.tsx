@@ -1225,8 +1225,24 @@ export default function App() {
         setEditableContent(cleanHtml);
         setActiveTab('article');
       } else {
-        const result = await optimizeSEOContent(keyword, existingArticle, contentType, additionalContext, brandVoice, (status) => {
+        const result = await optimizeSEOContent(keyword, existingArticle, contentType, additionalContext, brandVoice, (status, partialOutput) => {
           setStatusMessage(status);
+          const match = status.match(/Phase (\d+)/);
+          if (match && partialOutput) {
+            const phaseId = parseInt(match[1]);
+            setPhaseOutputs(prev => ({
+              ...prev,
+              [phaseId]: partialOutput
+            }));
+            
+            // Auto-expand the new phase only if the user is a pro user
+            if (userPlan !== 'free') {
+              setExpandedPhases(prev => ({
+                ...prev,
+                [phaseId]: true
+              }));
+            }
+          }
         });
         
         finalContent = result || "No content generated. Please try again.";
