@@ -457,7 +457,7 @@ Write an original Unique Value, human-first article that:
 
 • Should be better than top competitors.
 • Word count rule:
-  - Exceed competitor length by 15-25% only when every extra section earns its place
+  - Exceed competitor length by 5-10% only when every extra section earns its place
   - Run a mental check after every H2: does this section earn its length?
   - If a section can be said in 80 words, do not write 200
   - Padding is a ranking penalty signal in 2026, not a ranking boost

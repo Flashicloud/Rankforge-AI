@@ -58,7 +58,7 @@ export const extractArticleAndResearch = (fullText: string, currentMode: 'genera
     let endIndex = lines.length;
     for (let i = lines.length - 1; i >= Math.max(0, lines.length - 10); i--) {
       const line = lines[i].toLowerCase().trim();
-      if (line.match(/^(hope this helps|let me know|this concludes|here is|please let me know|note:|as an ai|as an ai language model|if you need|enjoy your article|that covers|feel free to|let's move on|moving on to)/)) {
+      if (line.match(/^(hope this helps|let me know|this concludes|here is|please let me know|as an ai|as an ai language model|if you need|enjoy your article|that covers|feel free to|let's move on|moving on to)/)) {
         endIndex = i;
         // Check if there are empty lines before it
         while (endIndex > 0 && lines[endIndex - 1].trim() === '') {
