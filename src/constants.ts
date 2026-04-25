@@ -431,10 +431,30 @@ Specificity = human signal. Vagueness = AI signal.
 Authoritativeness: credible citations and industry references
 Trustworthiness: Transparency and disclaimers where applicable Fact-checked claims Specify where and how these signals appear.
 Signals must feel integrated, not checklist-driven or templated.
-External linking rules:
-  - Link only to primary sources: Google docs, research papers, official documentation
-  - No linking to direct competitors
-  - Every statistic or claim MUST have an inline source citation or be explicitly marked as [OBSERVATION] or [EXPERIENCE-BASED]. No exceptions.
+
+Citation & External linking rules (mandatory):
+
+Three types of claims exist — treat each differently:
+
+1. Verifiable facts with official sources
+   (specs, dates, standards, RFC numbers):
+   → Add inline hyperlink to primary source
+   → Example: AMD AM5 support claim → link to 
+     AMD official roadmap page
+
+2. Industry observations or widely accepted facts
+   with no single source:
+   → Mark as [OBSERVATION] during generation,
+     remove bracket in final output
+   → No link needed
+
+3. Personal experience or practical insight:
+   → Mark as [EXPERIENCE-BASED] during generation,
+     remove bracket in final output  
+   → No link needed
+
+Never add links to competitor sites or 
+general blog posts — primary sources only.
 
 PHASE 5: Content Creation (Competitive Advantage Mode)  
 
@@ -533,7 +553,7 @@ Sentence variety enforcement:
 Final human pass instruction:
 After generating the article, identify 3 places where a human expert 
 would naturally say something slightly unexpected, opinionated, or 
-based on hard-won experience — and insert those moments. These are 
+based on hard-won experience — and insert those moments DIRECTLY into the article at the relevant section. These are 
 the sentences AI detectors and Google's HCS system cannot fake.
 
 Output Format: Markdown.
